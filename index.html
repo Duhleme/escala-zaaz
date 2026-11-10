@@ -116,12 +116,12 @@
                 <!-- Seção de Importação em Massa -->
                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
                     <h4 class="font-semibold text-sm text-blue-900 flex items-center gap-2">
-                        <i class="fa-solid fa-file-arrow-down"></i> Importação Direta do Excel (Copia e Cola)
+                        <i class="fa-solid fa-file-arrow-down"></i> Importação Direta do Excel / Google Sheets
                     </h4>
                     <p class="text-xs text-blue-700">
-                        Basta colar os dados do jeito que você copiou da planilha (com as linhas coladas). O sistema identifica automaticamente a data, horário, nome e tratativa.
+                        Basta selecionar e copiar as linhas da sua planilha e colar aqui direto (mesmo que fiquem com espaços entre as colunas).
                     </p>
-                    <textarea id="bulkData" rows="5" placeholder="Cole aqui os dados copiados do Excel..." class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    <textarea id="bulkData" rows="6" placeholder="Cole aqui os dados copiados direto da planilha..." class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     <div class="flex justify-end">
                         <button onclick="importExcelBulk()" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow">Processar e Importar Escala</button>
                     </div>
@@ -158,7 +158,7 @@
     </div>
 
     <script>
-        let plantoes = JSON.parse(localStorage.getItem('zaaz_plantoes_v4')) || [
+        let plantoes = JSON.parse(localStorage.getItem('zaaz_plantoes_v5')) || [
             { id: '1', categoria: 'feriados', data: '02/11/2026', diaSemana: 'Segunda (Finados)', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'FLAVIA MARIA COLTRI', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
             { id: '2', categoria: 'fds', data: '14/11/2026', diaSemana: 'Sábado', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'MAIKY FREITAS RODRIGUES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' }
         ];
@@ -227,7 +227,7 @@
             document.getElementById('badgeFds').innerText = cFds;
             document.getElementById('badgeFeriados').innerText = cFeriados;
 
-            localStorage.setItem('zaaz_plantoes_v4', JSON.stringify(plantoes));
+            localStorage.setItem('zaaz_plantoes_v5', JSON.stringify(plantoes));
         }
 
         function checkAdminAccess() {
@@ -240,7 +240,7 @@
         }
 
         function validatePassword() {
-            const pass = document.getElementById('adminPassword5') || document.getElementById('adminPassword').value;
+            const pass = document.getElementById('adminPassword').value;
             if(pass === 'R2wDz0u&') {
                 closePasswordModal();
                 document.getElementById('adminModal').classList.remove('hidden');
@@ -253,7 +253,7 @@
             document.getElementById('adminModal').classList.add('hidden');
         }
 
-        // LEITOR INTELIGENTE DO FORMATO DO EXCEL
+        // LEITOR INTELIGENTE ROBUSTO PARA ESPAÇOS E LINHAS DO EXCEL/SHEETS
         function importExcelBulk() {
             const rawText = document.getElementById('bulkData').value.trim();
             if(!rawText) {
@@ -261,52 +261,52 @@
                 return;
             }
 
-            // Regex inteligente para extrair Data, Dia, Horário, Nome e Tratativa do bloco colado
-            // Exemplo de padrão: 14/11/2026Sábado07:00-13:00 / 14:00-16:00NOME...Monitoramento...
-            const regex = /(\d{2}\/\d{2}\/\d{4})(Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo|Segunda-Feira|Terça-Feira|Quarta-Feira|Quinta-Feira|Sexta-Feira)([\d:\-\/\s]+?)([A-ZÃÕÁÉÍÓÚÂÊÔÇ\s]+?)(Monitoramento.*)/gi;
-
-            // Tratativa mais genérica caso o texto venha em linhas ou quebrado
             const lines = rawText.split('\n').filter(l => l.trim() !== '');
             let addedCount = 0;
 
             lines.forEach(line => {
-                // Tenta extrair usando padrões conhecidos do Excel colado
+                // Procura a data no formato DD/MM/AAAA
                 const matchDate = line.match(/\d{2}\/\d{2}\/\d{4}/);
                 if (matchDate) {
                     const dateStr = matchDate[0];
-                    const remainder = line.replace(dateStr, '');
+                    const dateIndex = line.indexOf(dateStr);
+                    const remainder = line.substring(dateIndex + dateStr.length).trim();
+
+                    // Identifica o dia da semana no início do resto do texto
+                    let diaSemana = 'Fim de Semana';
+                    const diasPossiveis = ['Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado', 'Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
                     
-                    // Identifica se é feriado (ex: Finados, Consciência Negra) ou Fim de Semana padrão
-                    let categoria = 'fds';
-                    if (remainder.toLowerCase().includes('finados') || remainder.toLowerCase().includes('consciencia') || remainder.toLowerCase().includes('feriado')) {
-                        categoria = 'feriados';
+                    for (let d of diasPossiveis) {
+                        if (remainder.startsWith(d)) {
+                            diaSemana = d;
+                            break;
+                        }
                     }
 
-                    // Extrai horários (formato XX:XX-XX:XX)
-                    const matchTime = remainder.match(/\d{2}:\d{2}[\d:\-\/\s]+/);
-                    let horario = matchTime ? matchTime[0].trim() : '07:00-13:00';
-                    
-                    // Extrai o dia da semana
-                    let diaSemana = 'Fim de Semana';
-                    if (remainder.includes('Sábado')) diaSemana = 'Sábado';
-                    else if (remainder.includes('Domingo')) diaSemana = 'Domingo';
-                    else if (remainder.includes('Segnda') || remainder.includes('Segunda')) diaSemana = 'Segunda-feira';
-                    else if (remainder.includes('Sexta')) diaSemana = 'Sexta-feira';
+                    let cleanAfterDay = remainder.replace(diaSemana, '').trim();
 
-                    // Restante do texto após remover data e hora costuma conter o Nome e a Tratativa
-                    let textWithoutTime = remainder.replace(horario, '').replace(diaSemana, '').trim();
-                    
-                    // Separar Nome do Plantonista (nomes geralmente estão em maiúsculas no início do texto restante)
-                    // Vamos isolar a tratativa que costuma começar com "Monitoramento"
-                    let tratativaIdx = textWithoutTime.indexOf('Monitoramento');
-                    let plantonista = 'COLABORADOR';
+                    // Procura pelo horário (ex: 07:00-13:00 ou com barra /)
+                    const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
+                    let horario = matchTime ? matchTime[0].trim() : '07:00-13:00';
+
+                    let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
+
+                    // Identifica onde começa a tratativa (geralmente começa com "Monitoramento")
+                    let tratativaIdx = cleanAfterTime.indexOf('Monitoramento');
+                    let plantonista = '';
                     let tratativa = 'Monitoramento da rede';
 
                     if (tratativaIdx > 0) {
-                        plantonista = textWithoutTime.substring(0, tratativaIdx).trim();
-                        tratativa = textWithoutTime.substring(tratativaIdx).trim();
+                        plantonista = cleanAfterTime.substring(0, tratativaIdx).trim();
+                        tratativa = cleanAfterTime.substring(tratativaIdx).trim();
                     } else {
-                        plantonista = textWithoutTime;
+                        plantonista = cleanAfterTime;
+                    }
+
+                    // Categoria (Feriado ou Fim de Semana)
+                    let categoria = 'fds';
+                    if (diaSemana.toLowerCase().includes('finados') || diaSemana.toLowerCase().includes('consciencia') || line.toLowerCase().includes('feriado')) {
+                        categoria = 'feriados';
                     }
 
                     if (plantonista.length > 2) {
@@ -325,11 +325,11 @@
             });
 
             if(addedCount > 0) {
-                alert(`${addedCount} plantões importados com sucesso direto do formato do Excel!`);
+                alert(`${addedCount} plantões importados com sucesso!`);
                 document.getElementById('bulkData').value = '';
                 render();
             } else {
-                alert('Não foi possível identificar o formato. Certifique-se de copiar as colunas direto da sua planilha do Excel e colar aqui.');
+                alert('Não foi possível processar os dados. Certifique-se de copiar as linhas inteiras da planilha e colar aqui.');
             }
         }
 
