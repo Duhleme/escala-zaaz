@@ -511,6 +511,26 @@
             }
         }
 
+        // --- NOVA FUNÇÃO PARA LIMPAR TODOS OS PLANTÕES ---
+        async function deleteAllPlantoes() {
+            if(plantoes.length === 0) {
+                alert('Não há plantões cadastrados para remover.');
+                return;
+            }
+
+            if(confirm('ATENÇÃO: Tem certeza absoluta que deseja excluir TODOS os plantões cadastrados? Esta ação limpará o mês inteiro.')) {
+                try {
+                    for (let p of plantoes) {
+                        await window.deleteDoc(window.doc(window.db, "plantoes", p.id));
+                    }
+                    alert('Todos os plantões foram removidos com sucesso!');
+                    carregarPlantoesFirebase();
+                } catch (error) {
+                    alert('Erro ao limpar os plantões.');
+                }
+            }
+        }
+
         document.getElementById('searchInput').addEventListener('input', render);
         document.getElementById('filterDate').addEventListener('input', render);
     </script>
