@@ -63,7 +63,7 @@
                         <input type="text" id="searchInput" placeholder="Buscar..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 border border-blue-700 rounded-lg text-white placeholder-blue-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     </div>
 
-                    <input type="text" id="filterDate" placeholder="Filtrar Data (Ex: 14/11)" class="w-full sm:w-40 px-3 py-2 bg-blue-800/60 border border-blue-700 rounded-lg text-white placeholder-blue-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <input type="text" id="filterDate" placeholder="Filtrar Data (Ex: 22/11)" class="w-full sm:w-40 px-3 py-2 bg-blue-800/60 border border-blue-700 rounded-lg text-white placeholder-blue-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
 
                     <button onclick="checkAdminAccess()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition flex items-center gap-2 whitespace-nowrap">
                         <i class="fa-solid fa-lock"></i> Painel Admin
@@ -142,23 +142,71 @@
             </div>
             
             <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <!-- Abas de Cadastro (Manual ou Massa) -->
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-4">
+                    <div class="flex justify-between items-center border-b border-blue-200 pb-2">
+                        <h4 id="formTitle" class="font-semibold text-sm text-blue-900 flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> Inserir ou Editar Plantão Manualmente
+                        </h4>
+                        <button id="btnCancelEdit" onclick="resetForm()" class="hidden text-xs text-red-600 font-semibold hover:underline"><i class="fa-solid fa-xmark"></i> Cancelar Edição</button>
+                    </div>
+
+                    <input type="hidden" id="editId" value="">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Data (Ex: 22/11/2026)</label>
+                            <input type="text" id="manualData" placeholder="DD/MM/AAAA" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Dia da Semana</label>
+                            <input type="text" id="manualDiaSemana" placeholder="Ex: Domingo" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Categoria</label>
+                            <select id="manualCategoria" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="fds">Fim de Semana</option>
+                                <option value="feriados">Feriado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Plantonista</label>
+                            <input type="text" id="manualPlantonista" placeholder="Nome completo" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Horário</label>
+                            <input type="text" id="manualHorario" placeholder="Ex: 07:00-13:00" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Tratativa</label>
+                            <input type="text" id="manualTratativa" value="Monitoramento da rede" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-1">
+                        <button onclick="salvarPlantaoManual()" id="btnSalvarManual" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar Plantão na Nuvem
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Seção de Importação em Massa -->
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
-                    <h4 class="font-semibold text-sm text-blue-900 flex items-center gap-2">
-                        <i class="fa-solid fa-file-arrow-down"></i> Importação Direta do Excel / Google Sheets
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                    <h4 class="font-semibold text-sm text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-file-arrow-down"></i> Ou Importação em Massa do Excel / Google Sheets
                     </h4>
-                    <p class="text-xs text-blue-700">
-                        Selecione as linhas da sua planilha, cole aqui e clique em processar. Os dados serão salvos direto na nuvem para toda a equipe.
-                    </p>
-                    <textarea id="bulkData" rows="5" placeholder="Cole aqui os dados copiados direto da planilha..." class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas copiadas direto da planilha..." class="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
-                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
                             <input type="checkbox" id="isFeriadoCheck" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <span class="text-xs font-semibold text-blue-900"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
+                            <span class="text-xs font-semibold text-gray-800"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
                         </label>
 
-                        <button onclick="importExcelBulk()" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow">Processar e Salvar na Nuvem</button>
+                        <button onclick="importExcelBulk()" class="px-4 py-2 bg-gray-800 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 shadow">Processar Lote e Salvar</button>
                     </div>
                 </div>
 
@@ -259,8 +307,9 @@
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'}">${p.categoria.toUpperCase()}</span></td>
                     <td class="p-3 text-gray-700">${p.plantonista}</td>
                     <td class="p-3 text-gray-500">${p.horario}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="deletePlantao('${p.id}')" class="text-red-600 hover:text-red-800 font-medium"><i class="fa-solid fa-trash"></i></button>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deletePlantao('${p.id}')" class="text-red-600 hover:text-red-800 font-medium" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 adminTableBody.appendChild(tr);
@@ -293,6 +342,75 @@
 
         function closeAdminModal() {
             document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        async function salvarPlantaoManual() {
+            const id = document.getElementById('editId').value;
+            const data = document.getElementById('manualData').value.trim();
+            const diaSemana = document.getElementById('manualDiaSemana').value.trim();
+            const categoria = document.getElementById('manualCategoria').value;
+            const plantonista = document.getElementById('manualPlantonista').value.trim().toUpperCase();
+            const horario = document.getElementById('manualHorario').value.trim();
+            const tratativa = document.getElementById('manualTratativa').value.trim();
+
+            if(!data || !plantonista || !horario) {
+                alert('Preencha pelo menos a Data, o Plantonista e o Horário!');
+                return;
+            }
+
+            const plantaoId = id ? id : 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            
+            const novoPlantao = {
+                categoria,
+                data,
+                diaSemana: diaSemana || 'Fim de Semana',
+                horario,
+                plantonista,
+                tratativa: tratativa || 'Monitoramento da rede'
+            };
+
+            try {
+                await window.setDoc(window.doc(window.db, "plantoes", plantaoId), novoPlantao);
+                alert(id ? 'Plantão atualizado com sucesso!' : 'Plantão cadastrado com sucesso!');
+                resetForm();
+                carregarPlantoesFirebase();
+            } catch (error) {
+                alert('Erro ao salvar plantão.');
+            }
+        }
+
+        function prepararEdicao(id) {
+            const p = plantoes.find(item => item.id === id);
+            if(!p) return;
+
+            document.getElementById('editId').value = p.id;
+            document.getElementById('manualData').value = p.data;
+            document.getElementById('manualDiaSemana').value = p.diaSemana;
+            document.getElementById('manualCategoria').value = p.categoria;
+            document.getElementById('manualPlantonista').value = p.plantonista;
+            document.getElementById('manualHorario').value = p.horario;
+            document.getElementById('manualTratativa').value = p.tratativa;
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600"></i> Editando Plantão de ${p.plantonista}`;
+            document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar Alterações`;
+            document.getElementById('btnCancelEdit').classList.remove('hidden');
+
+            const modalContent = document.querySelector('#adminModal .overflow-y-auto');
+            modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('editId').value = '';
+            document.getElementById('manualData').value = '';
+            document.getElementById('manualDiaSemana').value = '';
+            document.getElementById('manualCategoria').value = 'fds';
+            document.getElementById('manualPlantonista').value = '';
+            document.getElementById('manualHorario').value = '';
+            document.getElementById('manualTratativa').value = 'Monitoramento da rede';
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-user-plus"></i> Inserir ou Editar Plantão Manualmente`;
+            document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar Plantão na Nuvem`;
+            document.getElementById('btnCancelEdit').classList.add('hidden');
         }
 
         async function importExcelBulk() {
