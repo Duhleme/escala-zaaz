@@ -86,7 +86,7 @@
         </main>
     </div>
 
-    <!-- Footer -->
+    <!-- Footer com Assinatura -->
     <footer class="bg-white border-t border-gray-200 mt-12 py-4 text-center text-xs text-gray-500">
         ZaaZ Telecom &copy; 2026 - Painel Operacional CGR | Desenvolvido por <span class="font-semibold text-blue-900">Eduardo Leme</span>
     </footer>
@@ -119,18 +119,32 @@
                         <i class="fa-solid fa-file-arrow-down"></i> Importação Direta do Excel / Google Sheets
                     </h4>
                     <p class="text-xs text-blue-700">
-                        Basta selecionar e copiar as linhas da sua planilha e colar aqui direto. Se for feriado, marque a caixa abaixo antes de processar.
+                        Basta selecionar e copiar as linhas da sua planilha e colar aqui direto. Se for feriado (ex: 20/11), marque a caixa abaixo antes de processar.
                     </p>
                     <textarea id="bulkData" rows="5" placeholder="Cole aqui os dados copiados direto da planilha..." class="w-full border border-blue-200 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
-                        <!-- Caixinha de Feriado -->
+                        <!-- Caixinha de Feriado posicionada exatamente onde você pediu -->
                         <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-blue-200 shadow-sm">
                             <input type="checkbox" id="isFeriadoCheck" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
                             <span class="text-xs font-semibold text-blue-900"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
                         </label>
 
                         <button onclick="importExcelBulk()" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow">Processar e Importar Escala</button>
+                    </div>
+                </div>
+
+                <!-- Ferramentas de Backup / Sincronização entre Máquinas -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h4 class="font-semibold text-sm text-gray-800">Sincronizar entre Computadores</h4>
+                        <p class="text-xs text-gray-500">Exporte a escala para arquivo ou importe um arquivo salvo para atualizar outras máquinas.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportConfig()" class="px-3 py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-500 shadow"><i class="fa-solid fa-download"></i> Exportar Escala</button>
+                        <label class="px-3 py-2 bg-gray-700 text-white text-xs font-medium rounded-lg hover:bg-gray-600 shadow cursor-pointer">
+                            <i class="fa-solid fa-upload"></i> Importar Arquivo <input type="file" id="importFile" accept=".json" onchange="importConfig(event)" class="hidden">
+                        </label>
                     </div>
                 </div>
 
@@ -165,9 +179,10 @@
     </div>
 
     <script>
-        let plantoes = JSON.parse(localStorage.getItem('zaaz_plantoes_v6')) || [
+        let plantoes = JSON.parse(localStorage.getItem('zaaz_plantoes_v7')) || [
             { id: '1', categoria: 'feriados', data: '02/11/2026', diaSemana: 'Segunda (Finados)', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'FLAVIA MARIA COLTRI', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
-            { id: '2', categoria: 'fds', data: '14/11/2026', diaSemana: 'Sábado', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'MAIKY FREITAS RODRIGUES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' }
+            { id: '2', categoria: 'feriados', data: '20/11/2026', diaSemana: 'Sexta-feira (Consciência Negra)', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'MAIKY FREITAS RODRIGUES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '3', categoria: 'fds', data: '14/11/2026', diaSemana: 'Sábado', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'MAIKY FREITAS RODRIGUES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' }
         ];
 
         function render() {
@@ -234,7 +249,7 @@
             document.getElementById('badgeFds').innerText = cFds;
             document.getElementById('badgeFeriados').innerText = cFeriados;
 
-            localStorage.setItem('zaaz_plantoes_v6', JSON.stringify(plantoes));
+            localStorage.setItem('zaaz_plantoes_v7', JSON.stringify(plantoes));
         }
 
         function checkAdminAccess() {
@@ -289,9 +304,13 @@
                         }
                     }
 
-                    // Se for marcado como feriado e o dia for sexta, ajusta o texto bonitinho
-                    if (isFeriadoChecked && (dateStr === '20/11/2026' || diaSemana.includes('Sexta'))) {
-                        diaSemana = 'Sexta-feira (Consciência Negra)';
+                    // Se for feriado (ex: 20/11), formata o texto do dia corretamente
+                    if (isFeriadoChecked) {
+                        if (dateStr === '20/11/2026' || diaSemana.includes('Sexta')) {
+                            diaSemana = 'Sexta-feira (Consciência Negra)';
+                        } else {
+                            diaSemana = 'Feriado';
+                        }
                     }
 
                     let cleanAfterDay = remainder.replace(diaSemana, '').trim();
@@ -336,6 +355,38 @@
                 render();
             } else {
                 alert('Não foi possível processar os dados. Certifique-se de copiar as linhas inteiras da planilha e colar aqui.');
+            }
+        }
+
+        // Funções para Exportar e Importar Configuração (Sincronização entre Máquinas)
+        function exportConfig() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(plantoes));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "escala_zaaz_config.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importConfig(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function (e) {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if (Array.isArray(imported)) {
+                            plantoes = imported;
+                            render();
+                            alert('Escala importada e sincronizada com sucesso!');
+                        } else {
+                            alert('Arquivo inválido.');
+                        }
+                    } catch (error) {
+                        alert('Erro ao ler o arquivo de configuração.');
+                    }
+                };
             }
         }
 
