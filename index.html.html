@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Plantões - ZaaZ Telecom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-800 p-3 rounded-lg shadow-inner">
+                    <i class="fa-solid fa-network-wired text-2xl text-blue-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">ZaaZ Telecom - Escala CGR</h1>
+                    <p class="text-xs text-blue-200">Painel Operacional de Plantões, Fins de Semana e Feriados</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="relative w-full sm:w-64">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Buscar colaborador ou data..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 border border-blue-700 rounded-lg text-white placeholder-blue-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i> Novo Plantão
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Dias de Semana</p>
+                    <h3 id="countSemana" class="text-2xl font-bold text-gray-800 mt-1">0</h3>
+                </div>
+                <div class="bg-blue-50 text-blue-600 p-3 rounded-lg"><i class="fa-solid fa-calendar-days text-xl"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Fins de Semana</p>
+                    <h3 id="countFds" class="text-2xl font-bold text-gray-800 mt-1">0</h3>
+                </div>
+                <div class="bg-indigo-50 text-indigo-600 p-3 rounded-lg"><i class="fa-solid fa-mug-hot text-xl"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Feriados</p>
+                    <h3 id="countFeriados" class="text-2xl font-bold text-gray-800 mt-1">0</h3>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-3 rounded-lg"><i class="fa-solid fa-star text-xl"></i></div>
+            </div>
+        </div>
+
+        <!-- Columns Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Coluna: Dias de Semana -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[700px]">
+                <div class="p-4 border-b border-gray-100 bg-blue-50/50 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-semibold text-blue-900 flex items-center gap-2">
+                        <i class="fa-solid fa-briefcase text-blue-600"></i> Dias de Semana
+                    </h2>
+                    <span id="badgeSemana" class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="listSemana" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+            </div>
+
+            <!-- Coluna: Fins de Semana -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[700px]">
+                <div class="p-4 border-b border-gray-100 bg-indigo-50/50 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-semibold text-indigo-900 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-week text-indigo-600"></i> Fins de Semana
+                    </h2>
+                    <span id="badgeFds" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="listFds" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+            </div>
+
+            <!-- Coluna: Feriados -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[700px]">
+                <div class="p-4 border-b border-gray-100 bg-amber-50/50 rounded-t-xl flex justify-between items-center">
+                    <h2 class="font-semibold text-amber-900 flex items-center gap-2">
+                        <i class="fa-solid fa-flag text-amber-600"></i> Feriados
+                    </h2>
+                    <span id="badgeFeriados" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="listFeriados" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-4 text-center text-xs text-gray-500">
+        ZaaZ Telecom &copy; 2026 - Painel Operacional de Plantões CGR
+    </footer>
+
+    <!-- Modal Adicionar/Editar -->
+    <div id="plantaoModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden">
+            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-lg">Novo Plantão</h3>
+                <button onclick="closeModal()" class="text-blue-200 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="plantaoForm" onsubmit="savePlantao(event)" class="p-6 space-y-4">
+                <input type="hidden" id="plantaoId">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Categoria</label>
+                    <select id="categoria" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                        <option value="semana">Dias de Semana</option>
+                        <option value="fds">Fim de Semana</option>
+                        <option value="feriados">Feriados</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Data</label>
+                        <input type="text" id="dataPlantao" placeholder="Ex: 07/11/2026" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Dia da Semana / Descrição</label>
+                        <input type="text" id="diaSemana" placeholder="Ex: Sábado" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Horário</label>
+                    <input type="text" id="horario" placeholder="Ex: 07:00-13:00 / 14:00-16:00" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Plantonista</label>
+                    <input type="text" id="plantonista" placeholder="Nome do colaborador" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Função / Tratativa</label>
+                    <input type="text" id="tratativa" placeholder="Ex: Monitoramento da rede CORE/IVR" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 shadow">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script de Gestão -->
+    <script>
+        let plantoes = JSON.parse(localStorage.getItem('zaaz_plantoes')) || [
+            { id: '1', categoria: 'feriados', data: '02/11/2026', diaSemana: 'Segunda (Finados)', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'FLAVIA MARIA COLTRI', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '2', categoria: 'feriados', data: '02/11/2026', diaSemana: 'Segunda (Finados)', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'WESLEY DIOGO FELISBERTO INACIO', tratativa: 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo' },
+            { id: '3', categoria: 'feriados', data: '02/11/2026', diaSemana: 'Segunda (Finados)', horario: '13:00-19:00 / 20:00-22:00', plantonista: 'RICCELI PESSOA MACHADO FIALHO', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '4', categoria: 'feriados', data: '02/11/2026', diaSemana: 'Segunda (Finados)', horario: '22:00-02:00 / 03:00-07:00', plantonista: 'CLEYSSON FELIPE LOPES FERNANDES', tratativa: 'Monitoramento Noturno' },
+            { id: '5', categoria: 'feriados', data: '20/11/2026', diaSemana: 'Sexta (Consciência Negra)', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'MAIKY FREITAS RODRIGUES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '6', categoria: 'feriados', data: '20/11/2026', diaSemana: 'Sexta (Consciência Negra)', horario: '22:00-03:00 / 04:00-07:00', plantonista: 'DIEGO AUGUSTO TEGANI', tratativa: 'Monitoramento Noturno' },
+            { id: '7', categoria: 'fds', data: '07/11/2026', diaSemana: 'Sábado', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'WESLEY DIOGO FELISBERTO INACIO', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '8', categoria: 'fds', data: '07/11/2026', diaSemana: 'Sábado', horario: '08:00-13:00 / 14:00-17:00', plantonista: 'LEONARDO ALVES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '9', categoria: 'fds', data: '07/11/2026', diaSemana: 'Sábado', horario: '22:00-02:00 / 03:00-07:00', plantonista: 'CLEYSSON FELIPE LOPES FERNANDES', tratativa: 'Monitoramento Noturno' },
+            { id: '10', categoria: 'fds', data: '08/11/2026', diaSemana: 'Domingo', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'ALEXSANDER DE LIMA', tratativa: 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo' },
+            { id: '11', categoria: 'fds', data: '14/11/2026', diaSemana: 'Sábado', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'MAIKY FREITAS RODRIGUES', tratativa: 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo' },
+            { id: '12', categoria: 'fds', data: '15/11/2026', diaSemana: 'Domingo', horario: '07:00-13:00 / 14:00-16:00', plantonista: 'ELTON JUNIOR NATAL', tratativa: 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo' },
+            { id: '13', categoria: 'semana', data: '03/11/2026', diaSemana: 'Terça-feira', horario: '08:00-18:00', plantonista: 'LEVE OPERACIONAL CGR', tratativa: 'Suporte de Plantão Padrão - Semana' }
+        ];
+
+        function render() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const listSemana = document.getElementById('listSemana');
+            const listFds = document.getElementById('listFds');
+            const listFeriados = document.getElementById('listFeriados');
+
+            listSemana.innerHTML = '';
+            listFds.innerHTML = '';
+            listFeriados.innerHTML = '';
+
+            let cSemana = 0, cFds = 0, cFeriados = 0;
+
+            const filtered = plantoes.filter(p => 
+                p.plantonista.toLowerCase().includes(search) || 
+                p.data.includes(search) || 
+                p.diaSemana.toLowerCase().includes(search) ||
+                p.tratativa.toLowerCase().includes(search)
+            );
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                let borderColor = "border-l-4 border-l-blue-500";
+                if(p.categoria === 'fds') borderColor = "border-l-4 border-l-indigo-500";
+                if(p.categoria === 'feriados') borderColor = "border-l-4 border-l-amber-500";
+
+                card.className = `bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm hover:shadow transition relative group ${borderColor}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5">
+                        <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editPlantao('${p.id}')" class="text-gray-400 hover:text-blue-600 p-1 text-xs" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deletePlantao('${p.id}')" class="text-gray-400 hover:text-red-600 p-1 text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="font-semibold text-gray-800 text-sm mb-1">${p.plantonista}</div>
+                    <div class="text-xs text-blue-600 font-medium mb-1 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${p.horario}</div>
+                    <div class="text-xs text-gray-600 bg-gray-50 p-2 rounded">${p.tratativa}</div>
+                `;
+
+                if(p.categoria === 'semana') {
+                    listSemana.appendChild(card);
+                    cSemana++;
+                } else if(p.categoria === 'fds') {
+                    listFds.appendChild(card);
+                    cFds++;
+                } else if(p.categoria === 'feriados') {
+                    listFeriados.appendChild(card);
+                    cFeriados++;
+                }
+            });
+
+            document.getElementById('countSemana').innerText = cSemana;
+            document.getElementById('countFds').innerText = cFds;
+            document.getElementById('countFeriados').innerText = cFeriados;
+
+            document.getElementById('badgeSemana').innerText = cSemana;
+            document.getElementById('badgeFds').innerText = cFds;
+            document.getElementById('badgeFeriados').innerText = cFeriados;
+
+            localStorage.setItem('zaaz_plantoes', JSON.stringify(plantoes));
+        }
+
+        function openModal() {
+            document.getElementById('plantaoId').value = '';
+            document.getElementById('plantaoForm').reset();
+            document.getElementById('modalTitle').innerText = 'Novo Plantão';
+            document.getElementById('plantaoModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('plantaoModal').classList.add('hidden');
+        }
+
+        function savePlantao(e) {
+            e.preventDefault();
+            const id = document.getElementById('plantaoId').value;
+            const categoria = document.getElementById('categoria').value;
+            const data = document.getElementById('dataPlantao').value;
+            const diaSemana = document.getElementById('diaSemana').value;
+            const horario = document.getElementById('horario').value;
+            const plantonista = document.getElementById('plantonista').value;
+            const tratativa = document.getElementById('tratativa').value;
+
+            if(id) {
+                const p = plantoes.find(item => item.id === id);
+                if(p) {
+                    p.categoria = categoria;
+                    p.data = data;
+                    p.diaSemana = diaSemana;
+                    p.horario = horario;
+                    p.plantonista = plantonista;
+                    p.tratativa = tratativa;
+                }
+            } else {
+                const newP = {
+                    id: Date.now().toString(),
+                    categoria, data, diaSemana, horario, plantonista, tratativa
+                };
+                plantoes.push(newP);
+            }
+
+            closeModal();
+            render();
+        }
+
+        function editPlantao(id) {
+            const p = plantoes.find(item => item.id === id);
+            if(!p) return;
+
+            document.getElementById('plantaoId').value = p.id;
+            document.getElementById('categoria').value = p.categoria;
+            document.getElementById('dataPlantao').value = p.data;
+            document.getElementById('diaSemana').value = p.diaSemana;
+            document.getElementById('horario').value = p.horario;
+            document.getElementById('plantonista').value = p.plantonista;
+            document.getElementById('tratativa').value = p.tratativa;
+
+            document.getElementById('modalTitle').innerText = 'Editar Plantão';
+            document.getElementById('plantaoModal').classList.remove('hidden');
+        }
+
+        function deletePlantao(id) {
+            if(confirm('Tem certeza que deseja remover este plantão?')) {
+                plantoes = plantoes.filter(item => item.id !== id);
+                render();
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', render);
+        render();
+    </script>
+</body>
+</html>
