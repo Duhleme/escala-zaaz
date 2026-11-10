@@ -212,7 +212,12 @@
 
                 <!-- Tabela de Gestão -->
                 <div>
-                    <h4 class="font-semibold text-sm text-gray-700 mb-2">Plantões Cadastrados na Nuvem</h4>
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-semibold text-sm text-gray-700">Plantões Cadastrados na Nuvem</h4>
+                        <button onclick="deleteAllPlantoes()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> Limpar Todos
+                        </button>
+                    </div>
                     <div class="overflow-x-auto border border-gray-200 rounded-xl max-h-64">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead class="sticky top-0 bg-gray-100 text-gray-600 uppercase">
