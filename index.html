@@ -770,11 +770,13 @@
 
                     if (modoAtual === 'cgr') {
                         let cleanAfterDay = remainder.replace(diaSemana, '').trim();
+                        
+                        // Regex atualizada para capturar horários normais ou noturnos (que passam da meia-noite)
                         const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
                         let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
                         let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
                         
-                        // Remove dias da semana, parênteses e feriados (ex: CONSCIENCIA NEGRA) do nome
+                        // Remove dias da semana, parênteses e feriados do nome
                         let plantonista = cleanAfterTime
                             .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
                             .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
@@ -787,7 +789,15 @@
                         if (plantonista.length > 2) {
                             novoObjeto.plantonista = plantonista.toUpperCase();
                             novoObjeto.horario = horario;
-                            novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
+
+                            // --- REGRA INTELIGENTE DE TRATATIVA ---
+                            // Se o horário começa às 22:00, define automaticamente como Monitoramento Noturno
+                            if (horario.startsWith('22:00')) {
+                                novoObjeto.tratativa = 'Monitoramento Noturno';
+                            } else {
+                                novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
+                            }
+
                             await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
                             addedCount++;
                         }
