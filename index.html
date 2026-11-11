@@ -212,6 +212,11 @@
                         <div>
                             <label class="block text-xs font-medium text-blue-900 mb-1">Dia da Semana</label>
                             <select id="manualDiaSemana" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="Segunda-feira">Segunda-feira</option>
+                                <option value="Terça-feira">Terça-feira</option>
+                                <option value="Quarta-feira">Quarta-feira</option>
+                                <option value="Quinta-feira">Quinta-feira</option>
+                                <option value="Sexta-feira">Sexta-feira</option>
                                 <option value="Sábado">Sábado</option>
                                 <option value="Domingo">Domingo</option>
                             </select>
@@ -698,7 +703,7 @@
         function resetForm() {
             document.getElementById('editId').value = '';
             document.getElementById('manualData').value = '';
-            document.getElementById('manualDiaSemana').value = 'Sábado';
+            document.getElementById('manualDiaSemana').value = 'Segunda-feira';
             document.getElementById('manualCategoria').value = 'fds';
             document.getElementById('btnCancelEdit').classList.add('hidden');
             document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem`;
@@ -723,6 +728,11 @@
 
                     let diaSemana = 'Sábado';
                     if(remainder.includes('Domingo')) diaSemana = 'Domingo';
+                    if(remainder.includes('Segunda')) diaSemana = 'Segunda-feira';
+                    if(remainder.includes('Terça')) diaSemana = 'Terça-feira';
+                    if(remainder.includes('Quarta')) diaSemana = 'Quarta-feira';
+                    if(remainder.includes('Quinta')) diaSemana = 'Quinta-feira';
+                    if(remainder.includes('Sexta')) diaSemana = 'Sexta-feira';
                     if(isFeriadoChecked) diaSemana = 'Feriado';
 
                     let categoria = isFeriadoChecked ? 'feriados' : 'fds';
