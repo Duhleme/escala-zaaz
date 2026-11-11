@@ -565,6 +565,14 @@
                 return matchSearch && matchDate;
             });
 
+            // --- ORDENAR SEQUENCIALMENTE POR DATA (CRESCENTE) ---
+            filtered.sort((a, b) => {
+                // Converte "DD/MM/AAAA" para "AAAAMMDD" para ordenação correta
+                const d1 = a.data.split('/').reverse().join('');
+                const d2 = b.data.split('/').reverse().join('');
+                return d1.localeCompare(d2);
+            });
+
             filtered.forEach(p => {
                 const card = document.createElement('div');
                 let borderColor = "border-l-4 border-l-indigo-500";
