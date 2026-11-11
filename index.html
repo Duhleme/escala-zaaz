@@ -34,6 +34,7 @@
         window.deleteDoc = deleteDoc;
 
         window.carregarPlantoesFirebase();
+        window.carregarEquipeFirebase();
     </script>
 
     <style>body { font-family: 'Inter', sans-serif; }</style>
@@ -142,6 +143,20 @@
             </div>
             
             <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <!-- Gerenciar Equipe de Plantonistas -->
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 space-y-3">
+                    <h4 class="font-semibold text-sm text-indigo-900 flex items-center gap-2">
+                        <i class="fa-solid fa-users-gear"></i> Gerenciar Equipe de Plantonistas
+                    </h4>
+                    <div class="flex gap-2">
+                        <input type="text" id="novoEquipeNome" placeholder="Nome do novo plantonista (Ex: JOÃO SILVA)" class="w-full bg-white border border-indigo-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <button onclick="adicionarMembroEquipe()" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 shadow whitespace-nowrap">
+                            <i class="fa-solid fa-plus"></i> Adicionar à Lista
+                        </button>
+                    </div>
+                    <div id="listaEquipeTags" class="flex flex-wrap gap-2 pt-1"></div>
+                </div>
+
                 <!-- Cadastro Manual com Selects -->
                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-4">
                     <div class="flex justify-between items-center border-b border-blue-200 pb-2">
@@ -183,12 +198,7 @@
                         <div>
                             <label class="block text-xs font-medium text-blue-900 mb-1">Plantonista</label>
                             <select id="manualPlantonista" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="EDUARDO LEME QUEIROZ">EDUARDO LEME QUEIROZ</option>
-                                <option value="MAIKY FREITAS RODRIGUES">MAIKY FREITAS RODRIGUES</option>
-                                <option value="FRANCISCO ALVES PEREIRA JUNIOR">FRANCISCO ALVES PEREIRA JUNIOR</option>
-                                <option value="RICCELI PESSOA MACHADO FIALHO">RICCELI PESSOA MACHADO FIALHO</option>
-                                <option value="LORIVAL LUIZ FERNANDES JUNIOR">LORIVAL LUIZ FERNANDES JUNIOR</option>
-                                <option value="DIEGO AUGUSTO TEGANI">DIEGO AUGUSTO TEGANI</option>
+                                <!-- Dinâmico via Firebase -->
                             </select>
                         </div>
                         <div>
@@ -266,6 +276,7 @@
 
     <script>
         let plantoes = [];
+        let equipe = [];
 
         async function carregarPlantoesFirebase() {
             try {
@@ -277,6 +288,91 @@
                 render();
             } catch (error) {
                 console.error("Erro ao carregar do Firebase:", error);
+            }
+        }
+
+        async function carregarEquipeFirebase() {
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe"));
+                equipe = [];
+                querySnapshot.forEach((doc) => {
+                    equipe.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Se estiver vazio na nuvem, inicializa com a equipe padrão
+                if (equipe.length === 0) {
+                    const padroes = [
+                        "EDUARDO LEME QUEIROZ",
+                        "MAIKY FREITAS RODRIGUES",
+                        "FRANCISCO ALVES PEREIRA JUNIOR",
+                        "RICCELI PESSOA MACHADO FIALHO",
+                        "LORIVAL LUIZ FERNANDES JUNIOR",
+                        "DIEGO AUGUSTO TEGANI"
+                    ];
+                    for (let nome of padroes) {
+                        const id = 'eq_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                        await window.setDoc(window.doc(window.db, "equipe", id), { nome });
+                        equipe.push({ id, nome });
+                    }
+                }
+                atualizarSelectPlantonistas();
+            } catch (error) {
+                console.error("Erro ao carregar equipe:", error);
+            }
+        }
+
+        function atualizarSelectPlantonistas() {
+            const select = document.getElementById('manualPlantonista');
+            const tagsContainer = document.getElementById('listaEquipeTags');
+            
+            if(!select || !tagsContainer) return;
+
+            select.innerHTML = '';
+            tagsContainer.innerHTML = '';
+
+            equipe.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.nome;
+                opt.innerText = m.nome;
+                select.appendChild(opt);
+
+                const tag = document.createElement('div');
+                tag.className = "bg-white border border-indigo-200 text-indigo-900 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-2 shadow-sm";
+                tag.innerHTML = `
+                    <span>${m.nome}</span>
+                    <button onclick="removerMembroEquipe('${m.id}')" class="text-red-500 hover:text-red-700 font-bold" title="Remover da equipe"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                tagsContainer.appendChild(tag);
+            });
+        }
+
+        async function adicionarMembroEquipe() {
+            const input = document.getElementById('novoEquipeNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if(!nome) {
+                alert('Digite o nome do plantonista!');
+                return;
+            }
+
+            const id = 'eq_' + Date.now();
+            try {
+                await window.setDoc(window.doc(window.db, "equipe", id), { nome });
+                input.value = '';
+                carregarEquipeFirebase();
+            } catch (error) {
+                alert('Erro ao salvar na equipe.');
+            }
+        }
+
+        async function removerMembroEquipe(id) {
+            if(confirm('Deseja remover este plantonista da lista de seleção?')) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "equipe", id));
+                    carregarEquipeFirebase();
+                } catch (error) {
+                    alert('Erro ao remover membro.');
+                }
             }
         }
 
@@ -431,7 +527,6 @@
             document.getElementById('manualData').value = '';
             document.getElementById('manualDiaSemana').value = 'Sábado';
             document.getElementById('manualCategoria').value = 'fds';
-            document.getElementById('manualPlantonista').value = 'EDUARDO LEME QUEIROZ';
             document.getElementById('manualHorario').value = '07:00-13:00 / 14:00-16:00';
             document.getElementById('manualTratativa').value = 'Monitoramento da rede';
 
