@@ -191,3 +191,467 @@
                             <select id="manualDiaSemana" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                                 <option value="Segunda-feira">Segunda-feira</option>
                                 <option value="Terça-feira">Terça-feira</option>
+                                <option value="Quarta-feira">Quarta-feira</option>
+                                <option value="Quinta-feira">Quinta-feira</option>
+                                <option value="Sexta-feira">Sexta-feira</option>
+                                <option value="Sábado">Sábado</option>
+                                <option value="Domingo">Domingo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Categoria</label>
+                            <select id="manualCategoria" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="fds">Fim de Semana</option>
+                                <option value="feriados">Feriado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-medium text-blue-900">Plantonista</label>
+                                <button onclick="openEquipeModal()" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-gear"></i> Gerenciar Equipe
+                                </button>
+                            </div>
+                            <select id="manualPlantonista" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <!-- Dinâmico via Firebase -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Horário</label>
+                            <select id="manualHorario" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="07:00-13:00 / 14:00-16:00">07:00-13:00 / 14:00-16:00</option>
+                                <option value="13:00-18:00 / 19:00-22:00">13:00-18:00 / 19:00-22:00</option>
+                                <option value="13:00-19:00 / 20:00-22:00">13:00-19:00 / 20:00-22:00</option>
+                                <option value="22:00-02:00 / 03:00-07:00">22:00-02:00 / 03:00-07:00</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Tratativa</label>
+                            <select id="manualTratativa" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="Monitoramento da rede">Monitoramento da rede</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-1">
+                        <button onclick="salvarPlantaoManual()" id="btnSalvarManual" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar Plantão na Nuvem
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seção de Importação em Massa -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                    <h4 class="font-semibold text-sm text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-file-arrow-down"></i> Ou Importação em Massa do Excel / Google Sheets
+                    </h4>
+                    <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas copiadas direto da planilha..." class="w-full border border-gray-300 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+                            <input type="checkbox" id="isFeriadoCheck" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                            <span class="text-xs font-semibold text-gray-800"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
+                        </label>
+
+                        <button onclick="importExcelBulk()" class="px-4 py-2 bg-gray-800 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 shadow">Processar Lote e Salvar</button>
+                    </div>
+                </div>
+
+                <!-- Tabela de Gestão -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-semibold text-sm text-gray-700">Plantões Cadastrados na Nuvem</h4>
+                        <button onclick="deleteAllPlantoes()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> Limpar Todos
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto border border-gray-200 rounded-xl max-h-64">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="sticky top-0 bg-gray-100 text-gray-600 uppercase">
+                                <tr>
+                                    <th class="p-3">Data</th>
+                                    <th class="p-3">Tipo</th>
+                                    <th class="p-3">Plantonista</th>
+                                    <th class="p-3">Horário</th>
+                                    <th class="p-3 text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminTableBody" class="divide-y divide-gray-200">
+                                <!-- Dinâmico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button onclick="closeAdminModal()" class="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700">Fechar Painel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let plantoes = [];
+        let equipe = [];
+
+        async function carregarPlantoesFirebase() {
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "plantoes"));
+                plantoes = [];
+                querySnapshot.forEach((doc) => {
+                    plantoes.push({ id: doc.id, ...doc.data() });
+                });
+                render();
+            } catch (error) {
+                console.error("Erro ao carregar do Firebase:", error);
+            }
+        }
+
+        async function carregarEquipeFirebase() {
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe"));
+                equipe = [];
+                querySnapshot.forEach((doc) => {
+                    equipe.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (equipe.length === 0) {
+                    const padroes = [
+                        "EDUARDO LEME QUEIROZ",
+                        "MAIKY FREITAS RODRIGUES",
+                        "FRANCISCO ALVES PEREIRA JUNIOR",
+                        "RICCELI PESSOA MACHADO FIALHO",
+                        "LORIVAL LUIZ FERNANDES JUNIOR",
+                        "DIEGO AUGUSTO TEGANI"
+                    ];
+                    for (let nome of padroes) {
+                        const id = 'eq_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                        await window.setDoc(window.doc(window.db, "equipe", id), { nome });
+                        equipe.push({ id, nome });
+                    }
+                }
+                atualizarSelectPlantonistas();
+            } catch (error) {
+                console.error("Erro ao carregar equipe:", error);
+            }
+        }
+
+        function atualizarSelectPlantonistas() {
+            const select = document.getElementById('manualPlantonista');
+            const tagsContainer = document.getElementById('listaEquipeTags');
+            
+            if(!select || !tagsContainer) return;
+
+            select.innerHTML = '';
+            tagsContainer.innerHTML = '';
+
+            equipe.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.nome;
+                opt.innerText = m.nome;
+                select.appendChild(opt);
+
+                const tag = document.createElement('div');
+                tag.className = "bg-white border border-indigo-200 text-indigo-900 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center justify-between gap-2 shadow-sm w-full";
+                tag.innerHTML = `
+                    <span>${m.nome}</span>
+                    <button onclick="removerMembroEquipe('${m.id}')" class="text-red-500 hover:text-red-700 font-bold" title="Remover"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                tagsContainer.appendChild(tag);
+            });
+        }
+
+        function openEquipeModal() {
+            document.getElementById('equipeModal').classList.remove('hidden');
+        }
+
+        function closeEquipeModal() {
+            document.getElementById('equipeModal').classList.add('hidden');
+        }
+
+        async function adicionarMembroEquipe() {
+            const input = document.getElementById('novoEquipeNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if(!nome) {
+                alert('Digite o nome do plantonista!');
+                return;
+            }
+
+            const id = 'eq_' + Date.now();
+            try {
+                await window.setDoc(window.doc(window.db, "equipe", id), { nome });
+                input.value = '';
+                carregarEquipeFirebase();
+            } catch (error) {
+                alert('Erro ao salvar na equipe.');
+            }
+        }
+
+        async function removerMembroEquipe(id) {
+            if(confirm('Deseja remover este plantonista da lista de seleção?')) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "equipe", id));
+                    carregarEquipeFirebase();
+                } catch (error) {
+                    alert('Erro ao remover membro.');
+                }
+            }
+        }
+
+        function render() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filterDate = document.getElementById('filterDate').value.toLowerCase();
+            
+            const listFds = document.getElementById('listFds');
+            const listFeriados = document.getElementById('listFeriados');
+            const adminTableBody = document.getElementById('adminTableBody');
+
+            if(!listFds || !listFeriados) return;
+
+            listFds.innerHTML = '';
+            listFeriados.innerHTML = '';
+            adminTableBody.innerHTML = '';
+
+            let cFds = 0, cFeriados = 0;
+
+            const filtered = plantoes.filter(p => {
+                const matchSearch = p.plantonista.toLowerCase().includes(search) || 
+                                    p.diaSemana.toLowerCase().includes(search) ||
+                                    p.tratativa.toLowerCase().includes(search);
+                const matchDate = p.data.toLowerCase().includes(filterDate);
+                return matchSearch && matchDate;
+            });
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                let borderColor = "border-l-4 border-l-indigo-500";
+                if(p.categoria === 'feriados') borderColor = "border-l-4 border-l-amber-500";
+
+                card.className = `bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm transition ${borderColor}`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5">
+                        <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
+                    </div>
+                    <div class="font-semibold text-gray-800 text-sm mb-1">${p.plantonista}</div>
+                    <div class="text-xs text-blue-600 font-medium mb-1 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${p.horario}</div>
+                    <div class="text-xs text-gray-600 bg-gray-50 p-2 rounded">${p.tratativa}</div>
+                `;
+
+                if(p.categoria === 'fds') {
+                    listFds.appendChild(card);
+                    cFds++;
+                } else if(p.categoria === 'feriados') {
+                    listFeriados.appendChild(card);
+                    cFeriados++;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-gray-800">${p.data} (${p.diaSemana})</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'}">${p.categoria.toUpperCase()}</span></td>
+                    <td class="p-3 text-gray-700">${p.plantonista}</td>
+                    <td class="p-3 text-gray-500">${p.horario}</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deletePlantao('${p.id}')" class="text-red-600 hover:text-red-800 font-medium" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                adminTableBody.appendChild(tr);
+            });
+
+            document.getElementById('countFds').innerText = cFds;
+            document.getElementById('countFeriados').innerText = cFeriados;
+            document.getElementById('badgeFds').innerText = cFds;
+            document.getElementById('badgeFeriados').innerText = cFeriados;
+        }
+
+        function checkAdminAccess() {
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        function validatePassword() {
+            const pass = document.getElementById('adminPassword').value;
+            if(pass === 'R2wDz0u&') {
+                closePasswordModal();
+                document.getElementById('adminModal').classList.remove('hidden');
+            } else {
+                alert('Senha incorreta!');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        async function salvarPlantaoManual() {
+            const id = document.getElementById('editId').value;
+            const data = document.getElementById('manualData').value.trim();
+            const diaSemana = document.getElementById('manualDiaSemana').value;
+            const categoria = document.getElementById('manualCategoria').value;
+            const plantonista = document.getElementById('manualPlantonista').value;
+            const horario = document.getElementById('manualHorario').value;
+            const tratativa = document.getElementById('manualTratativa').value;
+
+            if(!data) {
+                alert('Preencha a Data do plantão!');
+                return;
+            }
+
+            const plantaoId = id ? id : 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            
+            const novoPlantao = {
+                categoria,
+                data,
+                diaSemana,
+                horario,
+                plantonista,
+                tratativa
+            };
+
+            try {
+                await window.setDoc(window.doc(window.db, "plantoes", plantaoId), novoPlantao);
+                alert(id ? 'Plantão atualizado com sucesso!' : 'Plantão cadastrado com sucesso!');
+                resetForm();
+                carregarPlantoesFirebase();
+            } catch (error) {
+                alert('Erro ao salvar plantão.');
+            }
+        }
+
+        function prepararEdicao(id) {
+            const p = plantoes.find(item => item.id === id);
+            if(!p) return;
+
+            document.getElementById('editId').value = p.id;
+            document.getElementById('manualData').value = p.data;
+            document.getElementById('manualDiaSemana').value = p.diaSemana;
+            document.getElementById('manualCategoria').value = p.categoria;
+            document.getElementById('manualPlantonista').value = p.plantonista;
+            document.getElementById('manualHorario').value = p.horario;
+            document.getElementById('manualTratativa').value = p.tratativa;
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600"></i> Editando Plantão de ${p.plantonista}`;
+            document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar Alterações`;
+            document.getElementById('btnCancelEdit').classList.remove('hidden');
+
+            const modalContent = document.querySelector('#adminModal .overflow-y-auto');
+            modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('editId').value = '';
+            document.getElementById('manualData').value = '';
+            document.getElementById('manualDiaSemana').value = 'Sábado';
+            document.getElementById('manualCategoria').value = 'fds';
+            document.getElementById('manualHorario').value = '07:00-13:00 / 14:00-16:00';
+            document.getElementById('manualTratativa').value = 'Monitoramento da rede';
+
+            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-user-plus"></i> Inserir ou Editar Plantão Manualmente`;
+            document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar Plantão na Nuvem`;
+            document.getElementById('btnCancelEdit').classList.add('hidden');
+        }
+
+        async function importExcelBulk() {
+            const rawText = document.getElementById('bulkData').value.trim();
+            const isFeriadoChecked = document.getElementById('isFeriadoCheck').checked;
+
+            if(!rawText) {
+                alert('Cole os dados copiados do Excel na caixa de texto!');
+                return;
+            }
+
+            const lines = rawText.split('\n').filter(l => l.trim() !== '');
+            let addedCount = 0;
+
+            for (let line of lines) {
+                const matchDate = line.match(/\d{2}\/\d{2}\/\d{4}/);
+                if (matchDate) {
+                    const dateStr = matchDate[0];
+                    const dateIndex = line.indexOf(dateStr);
+                    const remainder = line.substring(dateIndex + dateStr.length).trim();
+
+                    let diaSemana = 'Sábado';
+                    if(remainder.includes('Domingo')) diaSemana = 'Domingo';
+                    if(isFeriadoChecked) diaSemana = 'Feriado';
+
+                    let cleanAfterDay = remainder.replace(diaSemana, '').trim();
+                    const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
+                    let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
+
+                    let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
+                    let plantonista = cleanAfterTime.includes('Monitoramento') ? cleanAfterTime.split('Monitoramento')[0].trim() : cleanAfterTime;
+                    let tratativa = 'Monitoramento da rede';
+
+                    let categoria = isFeriadoChecked ? 'feriados' : 'fds';
+
+                    if (plantonista.length > 2) {
+                        const newId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                        const novoPlantao = {
+                            categoria,
+                            data: dateStr,
+                            diaSemana,
+                            horario,
+                            plantonista: plantonista.toUpperCase(),
+                            tratativa
+                        };
+
+                        await window.setDoc(window.doc(window.db, "plantoes", newId), novoPlantao);
+                        addedCount++;
+                    }
+                }
+            }
+
+            if(addedCount > 0) {
+                alert(`${addedCount} plantões salvos na nuvem com sucesso!`);
+                document.getElementById('bulkData').value = '';
+                document.getElementById('isFeriadoCheck').checked = false;
+                carregarPlantoesFirebase();
+            } else {
+                alert('Não foi possível processar os dados.');
+            }
+        }
+
+        async function deletePlantao(id) {
+            if(confirm('Tem certeza que deseja remover este plantão da nuvem?')) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, "plantoes", id));
+                    carregarPlantoesFirebase();
+                } catch (error) {
+                    alert('Erro ao excluir plantão.');
+                }
+            }
+        }
+
+        async function deleteAllPlantoes() {
+            if(plantoes.length === 0) {
+                alert('Não há plantões cadastrados para remover.');
+                return;
+            }
+
+            if(confirm('ATENÇÃO: Tem certeza absoluta que deseja excluir TODOS os plantões cadastrados? Esta ação limpará o mês inteiro.')) {
+                try {
+                    for (let p of plantoes) {
+                        await window.deleteDoc(window.doc(window.db, "plantoes", p.id));
+                    }
+                    alert('Todos os plantões foram removidos com sucesso!');
+                    carregarPlantoesFirebase();
+                } catch (error) {
+                    alert('Erro ao limpar os plantões.');
+                }
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', render);
+        document.getElementById('filterDate').addEventListener('input', render);
+    </script>
+</body>
+</html>
