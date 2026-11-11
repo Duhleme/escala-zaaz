@@ -207,7 +207,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs font-medium text-blue-900 mb-1">Data (Ex: 22/11/2026)</label>
-                            <input type="text" id="manualData" placeholder="DD/MM/AAAA" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <input type="text" id="manualData" placeholder="DD/MM/AAAA" maxlength="10" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-blue-900 mb-1">Dia da Semana</label>
@@ -335,6 +335,18 @@
         let supervisores = [];
         let equipeCgr = [];
         let equipeSup = [];
+
+        // Máscara automática para o campo de Data (DD/MM/AAAA)
+        document.getElementById('manualData').addEventListener('input', function (e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            if (v.length > 4) {
+                v = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+            } else if (v.length > 2) {
+                v = v.replace(/^(\d{2})(\d{0,2})/, '$1/$2');
+            }
+            e.target.value = v;
+        });
 
         async function carregarPlantoesFirebase() {
             try {
@@ -569,7 +581,7 @@
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-1.5">
                             <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} - ${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
+                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} -${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
                         </div>
                         <div class="font-semibold text-gray-800 text-sm mb-1"><i class="fa-solid fa-user-tie text-blue-600"></i> ${p.supervisor}</div>
                         <div class="text-xs text-gray-500">Região: SP</div>
@@ -765,25 +777,6 @@
             }
         }
 
-        async function deleteAllItems() {
-            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-            if(dadosAtuais.length === 0) { alert('Não há registros cadastrados para remover.'); return; }
+        async`
 
-            if(confirm('ATENÇÃO: Deseja excluir TODOS os registros da aba atual?')) {
-                try {
-                    const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
-                    for (let item of dadosAtuais) {
-                        await window.deleteDoc(window.doc(window.db, colecao, item.id));
-                    }
-                    alert('Registros removidos com sucesso!');
-                    if(modoAtual === 'cgr') carregarPlantoesFirebase();
-                    else carregarSupervisoresFirebase();
-                } catch (error) { alert('Erro ao limpar.'); }
-            }
-        }
-
-        document.getElementById('searchInput').addEventListener('input', render);
-        document.getElementById('filterDate').addEventListener('input', render);
-    </script>
-</body>
-</html>
+Basta colar o código atualizado no seu arquivo `index.html`. Agora, sempre que você digitar os números no campo de Data do formulário manual, as barras (`/`) vão aparecer automaticamente na medida certa (`DD/MM/AAAA`)!
