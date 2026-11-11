@@ -317,6 +317,9 @@
                     equipe.push({ id: doc.id, ...doc.data() });
                 });
 
+                // --- ORDENAR EM ORDEM ALFABÉTICA (A - Z) ---
+                equipe.sort((a, b) => a.nome.localeCompare(b.nome));
+
                 if (equipe.length === 0) {
                     const padroes = [
                         "EDUARDO LEME QUEIROZ",
