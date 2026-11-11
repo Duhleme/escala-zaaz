@@ -251,7 +251,7 @@
                         </div>
                     </div>
 
-                    <!-- Campos para Supervisores (Com Regiões Múltiplas) -->
+                    <!-- Campos para Supervisores -->
                     <div class="space-y-3 hidden" id="containerCamposSup">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
@@ -286,6 +286,7 @@
                         <select id="manualTratativa" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <option value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo</option>
                             <option value="Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo</option>
+                            <option value="Monitoramento Noturno">Monitoramento Noturno</option>
                         </select>
                     </div>
 
@@ -773,9 +774,10 @@
                         let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
                         let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
                         
-                        // --- REMOVE DIAS DA SEMANA E TEXTOS EXTRAS DO NOME ---
+                        // Remove dias da semana, parênteses e feriados (ex: CONSCIENCIA NEGRA) do nome
                         let plantonista = cleanAfterTime
-                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO|CONSCIÊNCIA NEGRA)/gi, '')
+                            .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
+                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
                             .trim();
 
                         if (plantonista.includes('Monitoramento')) {
@@ -792,8 +794,8 @@
                     } else {
                         let sigla = remainder.includes('ES') ? 'ES' : 'SA';
                         
-                        // --- REMOVE DIAS DA SEMANA E TERMOS DA LINHA DO SUPERVISOR ---
                         let supervisorNome = remainder
+                            .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
                             .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
                             .replace('SP', '').replace('PR', '').replace('MG', '')
                             .replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
