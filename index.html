@@ -251,23 +251,33 @@
                         </div>
                     </div>
 
-                    <!-- Campos para Supervisores -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden" id="containerCamposSup">
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-xs font-medium text-blue-900">Supervisor (Região SP)</label>
-                                <button onclick="openEquipeModal('sup')" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
-                                    <i class="fa-solid fa-gear"></i> Gerenciar Equipe
-                                </button>
+                    <!-- Campos para Supervisores (Com Regiões Múltiplas) -->
+                    <div class="space-y-3 hidden" id="containerCamposSup">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-xs font-medium text-blue-900">Supervisor</label>
+                                    <button onclick="openEquipeModal('sup')" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                                        <i class="fa-solid fa-gear"></i> Gerenciar Equipe
+                                    </button>
+                                </div>
+                                <select id="manualSupervisor" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                             </div>
-                            <select id="manualSupervisor" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+                            <div>
+                                <label class="block text-xs font-medium text-blue-900 mb-1">Status / Turno (Sigla)</label>
+                                <select id="manualSigla" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <option value="SA">SA - Sobreaviso</option>
+                                    <option value="ES">ES - Escala / Plantão</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-blue-900 mb-1">Status / Turno (Sigla)</label>
-                            <select id="manualSigla" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="SA">SA - Sobreaviso</option>
-                                <option value="ES">ES - Escala / Plantão</option>
-                            </select>
+                            <label class="block text-xs font-medium text-blue-900 mb-1">Regiões Atendidas:</label>
+                            <div class="flex items-center gap-4 bg-white p-2.5 rounded-lg border border-blue-200 text-xs">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="SP" class="w-4 h-4 text-blue-600 rounded"> SP</label>
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="PR" class="w-4 h-4 text-blue-600 rounded"> PR</label>
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="MG" class="w-4 h-4 text-blue-600 rounded"> MG</label>
+                            </div>
                         </div>
                     </div>
 
@@ -565,9 +575,8 @@
                 return matchSearch && matchDate;
             });
 
-            // --- ORDENAR SEQUENCIALMENTE POR DATA (CRESCENTE) ---
+            // Ordenar sequencialmente por data (crescente)
             filtered.sort((a, b) => {
-                // Converte "DD/MM/AAAA" para "AAAAMMDD" para ordenação correta
                 const d1 = a.data.split('/').reverse().join('');
                 const d2 = b.data.split('/').reverse().join('');
                 return d1.localeCompare(d2);
@@ -591,13 +600,14 @@
                     `;
                 } else {
                     const badgeSigla = p.sigla === 'SA' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800';
+                    const regioesExibidas = p.regioes ? p.regioes : 'SP';
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-1.5">
                             <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
                             <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} - ${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
                         </div>
                         <div class="font-semibold text-gray-800 text-sm mb-1"><i class="fa-solid fa-user-tie text-blue-600"></i> ${p.supervisor}</div>
-                        <div class="text-xs text-gray-500">Região: SP</div>
+                        <div class="text-xs text-gray-500 font-medium">Região: ${regioesExibidas}</div>
                     `;
                 }
 
@@ -612,7 +622,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50";
                 const colNomeVal = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
-                const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}">${p.sigla}</span>`;
+                const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
 
                 tr.innerHTML = `
                     <td class="p-3 font-medium text-gray-800">${p.data} (${p.diaSemana})</td>
@@ -670,6 +680,10 @@
             } else {
                 novoObjeto.supervisor = document.getElementById('manualSupervisor').value;
                 novoObjeto.sigla = document.getElementById('manualSigla').value;
+                
+                const checkboxes = document.querySelectorAll('input[name="regiaoSup"]:checked');
+                let regioesSelecionadas = Array.from(checkboxes).map(cb => cb.value);
+                novoObjeto.regioes = regioesSelecionadas.length > 0 ? regioesSelecionadas.join(', ') : 'SP';
             }
 
             try {
@@ -698,6 +712,11 @@
             } else {
                 document.getElementById('manualSupervisor').value = p.supervisor;
                 document.getElementById('manualSigla').value = p.sigla;
+                
+                const regioesArr = p.regioes ? p.regioes.split(', ') : ['SP'];
+                document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => {
+                    cb.checked = regioesArr.includes(cb.value);
+                });
             }
 
             document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600"></i> Editando Registro`;
@@ -713,6 +732,7 @@
             document.getElementById('manualData').value = '';
             document.getElementById('manualDiaSemana').value = 'Segunda-feira';
             document.getElementById('manualCategoria').value = 'fds';
+            document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => cb.checked = false);
             document.getElementById('btnCancelEdit').classList.add('hidden');
             document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem`;
         }
@@ -768,6 +788,7 @@
                         if (supervisorNome.length > 2) {
                             novoObjeto.supervisor = supervisorNome.toUpperCase();
                             novoObjeto.sigla = sigla;
+                            novoObjeto.regioes = 'SP'; // Padrão na importação em massa
                             await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
                             addedCount++;
                         }
