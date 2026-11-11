@@ -134,7 +134,7 @@
         </div>
     </div>
 
-    <!-- Modal Pop-up para Gerenciar Equipe -->
+    <!-- Modal Pop-up para Gerenciar Equipe (z-[70] para ficar na frente) -->
     <div id="equipeModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
@@ -207,7 +207,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-xs font-medium text-blue-900">Plantonista</label>
@@ -228,14 +228,14 @@
                                 <option value="22:00-02:00 / 03:00-07:00">22:00-02:00 / 03:00-07:00</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-blue-900 mb-1">Tratativa</label>
-                            <select id="manualTratativa" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo">CORE/IVR (SP/PR/MG) + Chat</option>
-                                <option value="Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo">GPON (SP/PR/MG) + Chat</option>
-                            </select>
-                        </div>
-                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-blue-900 mb-1">Tratativa</label>
+                        <select id="manualTratativa" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo</option>
+                            <option value="Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo</option>
+                        </select>
                     </div>
 
                     <div class="flex justify-end pt-1">
@@ -319,9 +319,6 @@
                     equipe.push({ id: doc.id, ...doc.data() });
                 });
 
-                // --- ORDENAR EM ORDEM ALFABÉTICA (A - Z) ---
-                equipe.sort((a, b) => a.nome.localeCompare(b.nome));
-
                 if (equipe.length === 0) {
                     const padroes = [
                         "EDUARDO LEME QUEIROZ",
@@ -337,6 +334,10 @@
                         equipe.push({ id, nome });
                     }
                 }
+
+                // Ordenar em ordem alfabética (A - Z)
+                equipe.sort((a, b) => a.nome.localeCompare(b.nome));
+
                 atualizarSelectPlantonistas();
             } catch (error) {
                 console.error("Erro ao carregar equipe:", error);
@@ -504,7 +505,7 @@
             const categoria = document.getElementById('manualCategoria').value;
             const plantonista = document.getElementById('manualPlantonista').value;
             const horario = document.getElementById('manualHorario').value;
-            const tratativa = document.getElementById('').value;
+            const tratativa = document.getElementById('manualTratativa').value;
 
             if(!data) {
                 alert('Preencha a Data do plantão!');
@@ -555,7 +556,7 @@
         function resetForm() {
             document.getElementById('editId').value = '';
             document.getElementById('manualData').value = '';
-            document.getElementById('manualDiaSemana').value = 'Sábado';
+            document.getElementById('manualDiaSemana').value = 'Segunda-feira';
             document.getElementById('manualCategoria').value = 'fds';
             document.getElementById('manualHorario').value = '07:00-13:00 / 14:00-16:00';
             document.getElementById('manualTratativa').value = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
@@ -586,7 +587,11 @@
 
                     let diaSemana = 'Sábado';
                     if(remainder.includes('Domingo')) diaSemana = 'Domingo';
-                    if(isFeriadoChecked) diaSemana = 'Feriado';
+                    if(remainder.includes('Segunda')) diaSemana = 'Segunda-feira';
+                    if(remainder.includes('Terça')) diaSemana = 'Terça-feira';
+                    if(remainder.includes('Quarta')) diaSemana = 'Quarta-feira';
+                    if(remainder.includes('Quinta')) diaSemana = 'Quinta-feira';
+                    if(remainder.includes('Sexta')) diaSemana = 'Sexta-feira';
 
                     let cleanAfterDay = remainder.replace(diaSemana, '').trim();
                     const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
@@ -594,7 +599,7 @@
 
                     let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
                     let plantonista = cleanAfterTime.includes('Monitoramento') ? cleanAfterTime.split('Monitoramento')[0].trim() : cleanAfterTime;
-                    let tratativa = 'Monitoramento da rede';
+                    let tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
 
                     let categoria = isFeriadoChecked ? 'feriados' : 'fds';
 
