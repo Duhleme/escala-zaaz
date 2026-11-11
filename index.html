@@ -772,7 +772,15 @@
                         const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
                         let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
                         let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
-                        let plantonista = cleanAfterTime.includes('Monitoramento') ? cleanAfterTime.split('Monitoramento')[0].trim() : cleanAfterTime;
+                        
+                        // --- REMOVE DIAS DA SEMANA E TEXTOS EXTRAS DO NOME ---
+                        let plantonista = cleanAfterTime
+                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO|CONSCIÊNCIA NEGRA)/gi, '')
+                            .trim();
+
+                        if (plantonista.includes('Monitoramento')) {
+                            plantonista = plantonista.split('Monitoramento')[0].trim();
+                        }
 
                         if (plantonista.length > 2) {
                             novoObjeto.plantonista = plantonista.toUpperCase();
@@ -783,12 +791,17 @@
                         }
                     } else {
                         let sigla = remainder.includes('ES') ? 'ES' : 'SA';
-                        let supervisorNome = remainder.replace('SP', '').replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
+                        
+                        // --- REMOVE DIAS DA SEMANA E TERMOS DA LINHA DO SUPERVISOR ---
+                        let supervisorNome = remainder
+                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
+                            .replace('SP', '').replace('PR', '').replace('MG', '')
+                            .replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
 
                         if (supervisorNome.length > 2) {
                             novoObjeto.supervisor = supervisorNome.toUpperCase();
                             novoObjeto.sigla = sigla;
-                            novoObjeto.regioes = 'SP'; // Padrão na importação em massa
+                            novoObjeto.regioes = 'SP';
                             await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
                             addedCount++;
                         }
