@@ -48,9 +48,20 @@
         <header class="bg-blue-900 text-white shadow-md">
             <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="bg-blue-800 p-3 rounded-lg shadow-inner">
-                        <i class="fa-solid fa-network-wired text-2xl text-blue-300"></i>
-                    </div>
+                    <div class="p-1 rounded-lg flex items-center justify-center w-12 h-12 overflow-hidden">
+    <svg viewBox="0 0 500 500" class="w-full h-full object-contain">
+        <!-- Fundo Hexágono Amarelo -->
+        <polygon points="250,30 430,135 430,365 250,470 70,365 70,135" fill="#f4b223" />
+        <!-- Desenho Interno (Camadas) -->
+        <g fill="none" stroke="#2c2560" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M250,110 L370,170 L250,230 L130,170 Z" />
+            <path d="M130,235 L250,295 L370,235" />
+            <path d="M130,300 L250,360 L250,400 L220,385 L130,300 Z" />
+            <path d="M210,135 L200,105" />
+            <path d="M290,135 L300,105" />
+        </g>
+    </svg>
+</div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">ZaaZ Telecom - Painel Operacional</h1>
                         <p id="subHeaderTitle" class="text-xs text-blue-200">Escala CGR (Fins de Semana e Feriados)</p>
