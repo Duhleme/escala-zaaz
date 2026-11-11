@@ -173,11 +173,25 @@
     </div>
 
     <!-- Modal Painel Administrativo -->
+    <!-- Modal Painel Administrativo -->
     <div id="adminModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+            <div class="bg-blue-900 text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <h3 id="adminModalTitle" class="font-bold text-lg"><i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR</h3>
-                <button onclick="closeAdminModal()" class="text-blue-200 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                
+                <div class="flex items-center gap-3">
+                    <!-- Alternador dentro do Admin -->
+                    <div class="bg-blue-950 p-1 rounded-lg flex gap-1 border border-blue-800">
+                        <button id="adminBtnCgr" onclick="mudarPainel('cgr')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-headset"></i> CGR
+                        </button>
+                        <button id="adminBtnSup" onclick="mudarPainel('sup')" class="px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1">
+                            <i class="fa-solid fa-user-tie"></i> Supervisores
+                        </button>
+                    </div>
+
+                    <button onclick="closeAdminModal()" class="text-blue-200 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
             </div>
             
             <div class="p-6 overflow-y-auto space-y-6 flex-grow">
@@ -396,8 +410,15 @@
 
         function mudarPainel(novoModo) {
             modoAtual = novoModo;
+            
+            // Botões da Dash principal
             const btnCgr = document.getElementById('btnTabCgr');
             const btnSup = document.getElementById('btnTabSup');
+            
+            // Botões de dentro do Admin
+            const adminBtnCgr = document.getElementById('adminBtnCgr');
+            const adminBtnSup = document.getElementById('adminBtnSup');
+
             const subHeader = document.getElementById('subHeaderTitle');
             const label1 = document.getElementById('labelCard1');
             const label2 = document.getElementById('labelCard2');
@@ -411,8 +432,11 @@
             const thDetalhe = document.getElementById('thColDetalhe');
 
             if (modoAtual === 'cgr') {
-                btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1.5";
-                btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1.5";
+                if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1.5";
+                if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1.5";
+                if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
+                if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1";
+
                 subHeader.innerText = "Escala CGR (Fins de Semana e Feriados)";
                 label1.innerText = "Fins de Semana Escalados";
                 label2.innerText = "Feriados Escalados";
@@ -425,8 +449,11 @@
                 thNome.innerText = "Plantonista";
                 thDetalhe.innerText = "Horário";
             } else {
-                btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1.5";
-                btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1.5";
+                if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1.5";
+                if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1.5";
+                if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
+                if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 hover:text-white transition flex items-center gap-1";
+
                 subHeader.innerText = "Escala de Supervisores de Campo (Sábados, Domingos e Feriados)";
                 label1.innerText = "Sobreavisos (SA) FDS";
                 label2.innerText = "Escalas de Sábado (ES)";
