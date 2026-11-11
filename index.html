@@ -35,7 +35,8 @@
 
         window.carregarPlantoesFirebase();
         window.carregarSupervisoresFirebase();
-        window.carregarEquipeFirebase();
+        window.carregarEquipeCgrFirebase();
+        window.carregarEquipeSupFirebase();
     </script>
 
     <style>body { font-family: 'Inter', sans-serif; }</style>
@@ -58,7 +59,6 @@
 
                 <!-- Botões de Alternância e Ações -->
                 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-                    <!-- Alternador de Modos -->
                     <div class="bg-blue-950 p-1 rounded-xl flex gap-1 border border-blue-800">
                         <button id="btnTabCgr" onclick="mudarPainel('cgr')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1.5">
                             <i class="fa-solid fa-headset"></i> CGR
@@ -145,19 +145,19 @@
         </div>
     </div>
 
-    <!-- Modal Pop-up para Gerenciar Equipe -->
+    <!-- Modal Pop-up para Gerenciar Equipe (CGR ou Supervisores) -->
     <div id="equipeModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-sm text-indigo-900 flex items-center gap-2">
-                    <i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe de Plantonistas
+                <h3 id="equipeModalTitle" class="font-bold text-sm text-indigo-900 flex items-center gap-2">
+                    <i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe CGR
                 </h3>
                 <button onclick="closeEquipeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
             <div class="space-y-3">
                 <div class="flex gap-2">
-                    <input type="text" id="novoEquipeNome" placeholder="Nome do plantonista (Ex: JOÃO SILVA)" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="text" id="novoEquipeNome" placeholder="Nome completo..." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     <button onclick="adicionarMembroEquipe()" class="px-3 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 shadow whitespace-nowrap">
                         <i class="fa-solid fa-plus"></i> Adicionar
                     </button>
@@ -173,14 +173,12 @@
     </div>
 
     <!-- Modal Painel Administrativo -->
-    <!-- Modal Painel Administrativo -->
     <div id="adminModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="bg-blue-900 text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <h3 id="adminModalTitle" class="font-bold text-lg"><i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR</h3>
                 
                 <div class="flex items-center gap-3">
-                    <!-- Alternador dentro do Admin -->
                     <div class="bg-blue-950 p-1 rounded-lg flex gap-1 border border-blue-800">
                         <button id="adminBtnCgr" onclick="mudarPainel('cgr')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1">
                             <i class="fa-solid fa-headset"></i> CGR
@@ -199,7 +197,7 @@
                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-4">
                     <div class="flex justify-between items-center border-b border-blue-200 pb-2">
                         <h4 id="formTitle" class="font-semibold text-sm text-blue-900 flex items-center gap-2">
-                            <i class="fa-solid fa-user-plus"></i> Inserir ou Editar Plantão Manualmente
+                            <i class="fa-solid fa-user-plus"></i> Inserir ou Editar Manualmente
                         </h4>
                         <button id="btnCancelEdit" onclick="resetForm()" class="hidden text-xs text-red-600 font-semibold hover:underline"><i class="fa-solid fa-xmark"></i> Cancelar Edição</button>
                     </div>
@@ -231,7 +229,7 @@
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-xs font-medium text-blue-900">Plantonista</label>
-                                <button onclick="openEquipeModal()" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                                <button onclick="openEquipeModal('cgr')" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
                                     <i class="fa-solid fa-gear"></i> Gerenciar Equipe
                                 </button>
                             </div>
@@ -248,11 +246,16 @@
                         </div>
                     </div>
 
-                    <!-- Campos exclusivos para Supervisores -->
+                    <!-- Campos para Supervisores -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 hidden" id="containerCamposSup">
                         <div>
-                            <label class="block text-xs font-medium text-blue-900 mb-1">Supervisor (Região SP)</label>
-                            <input type="text" id="manualSupervisor" placeholder="Nome do Supervisor" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-medium text-blue-900">Supervisor (Região SP)</label>
+                                <button onclick="openEquipeModal('sup')" class="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-gear"></i> Gerenciar Equipe
+                                </button>
+                            </div>
+                            <select id="manualSupervisor" class="w-full bg-white border border-blue-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-blue-900 mb-1">Status / Turno (Sigla)</label>
@@ -327,77 +330,100 @@
 
     <script>
         let modoAtual = 'cgr'; // 'cgr' ou 'sup'
+        let tipoEquipeAtual = 'cgr'; // 'cgr' ou 'sup' para o modal de equipe
         let plantoes = [];
         let supervisores = [];
-        let equipe = [];
+        let equipeCgr = [];
+        let equipeSup = [];
 
         async function carregarPlantoesFirebase() {
             try {
                 const querySnapshot = await window.getDocs(window.collection(window.db, "plantoes"));
                 plantoes = [];
-                querySnapshot.forEach((doc) => {
-                    plantoes.push({ id: doc.id, ...doc.data() });
-                });
+                querySnapshot.forEach((doc) => { plantoes.push({ id: doc.id, ...doc.data() }); });
                 if(modoAtual === 'cgr') render();
-            } catch (error) {
-                console.error("Erro ao carregar CGR:", error);
-            }
+            } catch (error) { console.error("Erro CGR:", error); }
         }
 
         async function carregarSupervisoresFirebase() {
             try {
                 const querySnapshot = await window.getDocs(window.collection(window.db, "supervisores"));
                 supervisores = [];
-                querySnapshot.forEach((doc) => {
-                    supervisores.push({ id: doc.id, ...doc.data() });
-                });
+                querySnapshot.forEach((doc) => { supervisores.push({ id: doc.id, ...doc.data() }); });
                 if(modoAtual === 'sup') render();
-            } catch (error) {
-                console.error("Erro ao carregar Supervisores:", error);
-            }
+            } catch (error) { console.error("Erro Supervisores:", error); }
         }
 
-        async function carregarEquipeFirebase() {
+        async function carregarEquipeCgrFirebase() {
             try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe"));
-                equipe = [];
-                querySnapshot.forEach((doc) => {
-                    equipe.push({ id: doc.id, ...doc.data() });
-                });
+                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe_cgr"));
+                equipeCgr = [];
+                querySnapshot.forEach((doc) => { equipeCgr.push({ id: doc.id, ...doc.data() }); });
 
-                if (equipe.length === 0) {
-                    const padroes = [
-                        "EDUARDO LEME QUEIROZ", "MAIKY FREITAS RODRIGUES",
-                        "FRANCISCO ALVES PEREIRA JUNIOR", "RICCELI PESSOA MACHADO FIALHO",
-                        "LORIVAL LUIZ FERNANDES JUNIOR", "DIEGO AUGUSTO TEGANI"
-                    ];
+                if (equipeCgr.length === 0) {
+                    const padroes = ["EDUARDO LEME QUEIROZ", "MAIKY FREITAS RODRIGUES", "FRANCISCO ALVES PEREIRA JUNIOR", "RICCELI PESSOA MACHADO FIALHO", "LORIVAL LUIZ FERNANDES JUNIOR", "DIEGO AUGUSTO TEGANI"];
                     for (let nome of padroes) {
-                        const id = 'eq_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-                        await window.setDoc(window.doc(window.db, "equipe", id), { nome });
-                        equipe.push({ id, nome });
+                        const id = 'eqc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                        await window.setDoc(window.doc(window.db, "equipe_cgr", id), { nome });
+                        equipeCgr.push({ id, nome });
                     }
                 }
-                equipe.sort((a, b) => a.nome.localeCompare(b.nome));
-                atualizarSelectPlantonistas();
-            } catch (error) {
-                console.error("Erro ao carregar equipe:", error);
-            }
+                equipeCgr.sort((a, b) => a.nome.localeCompare(b.nome));
+                atualizarSelectCgr();
+            } catch (error) { console.error("Erro equipe CGR:", error); }
         }
 
-        function atualizarSelectPlantonistas() {
+        async function carregarEquipeSupFirebase() {
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe_sup"));
+                equipeSup = [];
+                querySnapshot.forEach((doc) => { equipeSup.push({ id: doc.id, ...doc.data() }); });
+
+                if (equipeSup.length === 0) {
+                    const padroesSup = ["WELLINGTON CAMARGO DOS SANTOS", "LUCAS AUGUSTO DE PAULA", "WESLEY SANTOS DO NASCIMENTO", "FABIO PEREIRA", "NIVALDO RODRIGUES DOS SANTOS"];
+                    for (let nome of padroesSup) {
+                        const id = 'eqs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                        await window.setDoc(window.doc(window.db, "equipe_sup", id), { nome });
+                        equipeSup.push({ id, nome });
+                    }
+                }
+                equipeSup.sort((a, b) => a.nome.localeCompare(b.nome));
+                atualizarSelectSup();
+            } catch (error) { console.error("Erro equipe Sup:", error); }
+        }
+
+        function atualizarSelectCgr() {
             const select = document.getElementById('manualPlantonista');
-            const tagsContainer = document.getElementById('listaEquipeTags');
-            if(!select || !tagsContainer) return;
-
+            if(!select) return;
             select.innerHTML = '';
-            tagsContainer.innerHTML = '';
-
-            equipe.forEach(m => {
+            equipeCgr.forEach(m => {
                 const opt = document.createElement('option');
-                opt.value = m.nome;
-                opt.innerText = m.nome;
+                opt.value = m.nome; opt.innerText = m.nome;
                 select.appendChild(opt);
+            });
+        }
 
+        function atualizarSelectSup() {
+            const select = document.getElementById('manualSupervisor');
+            if(!select) return;
+            select.innerHTML = '';
+            equipeSup.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.nome; opt.innerText = m.nome;
+                select.appendChild(opt);
+            });
+        }
+
+        function abrirModalEquipeNaTela() {
+            const tagsContainer = document.getElementById('listaEquipeTags');
+            const modalTitle = document.getElementById('equipeModalTitle');
+            if(!tagsContainer) return;
+
+            tagsContainer.innerHTML = '';
+            const listaAtiva = tipoEquipeAtual === 'cgr' ? equipeCgr : equipeSup;
+            modalTitle.innerHTML = `<i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe ${tipoEquipeAtual === 'cgr' ? 'CGR' : 'Supervisores'}`;
+
+            listaAtiva.forEach(m => {
                 const tag = document.createElement('div');
                 tag.className = "bg-white border border-indigo-200 text-indigo-900 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center justify-between gap-2 shadow-sm w-full";
                 tag.innerHTML = `
@@ -408,17 +434,47 @@
             });
         }
 
+        function openEquipeModal(tipo) {
+            tipoEquipeAtual = tipo;
+            abrirModalEquipeNaTela();
+            document.getElementById('equipeModal').classList.remove('hidden');
+        }
+
+        function closeEquipeModal() { document.getElementById('equipeModal').classList.add('hidden'); }
+
+        async function adicionarMembroEquipe() {
+            const input = document.getElementById('novoEquipeNome');
+            const nome = input.value.trim().toUpperCase();
+            if(!nome) return alert('Digite o nome!');
+
+            const colecaoDb = tipoEquipeAtual === 'cgr' ? 'equipe_cgr' : 'equipe_sup';
+            const id = (tipoEquipeAtual === 'cgr' ? 'eqc_' : 'eqs_') + Date.now();
+            
+            await window.setDoc(window.doc(window.db, colecaoDb, id), { nome });
+            input.value = '';
+            
+            if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
+            else carregarEquipeSupFirebase();
+            abrirModalEquipeNaTela();
+        }
+
+        async function removerMembroEquipe(id) {
+            if(confirm('Remover membro da equipe?')) {
+                const colecaoDb = tipoEquipeAtual === 'cgr' ? 'equipe_cgr' : 'equipe_sup';
+                await window.deleteDoc(window.doc(window.db, colecaoDb, id));
+                
+                if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
+                else carregarEquipeSupFirebase();
+                abrirModalEquipeNaTela();
+            }
+        }
+
         function mudarPainel(novoModo) {
             modoAtual = novoModo;
-            
-            // Botões da Dash principal
             const btnCgr = document.getElementById('btnTabCgr');
             const btnSup = document.getElementById('btnTabSup');
-            
-            // Botões de dentro do Admin
             const adminBtnCgr = document.getElementById('adminBtnCgr');
             const adminBtnSup = document.getElementById('adminBtnSup');
-
             const subHeader = document.getElementById('subHeaderTitle');
             const label1 = document.getElementById('labelCard1');
             const label2 = document.getElementById('labelCard2');
@@ -557,23 +613,17 @@
             document.getElementById('passwordModal').classList.remove('hidden');
         }
 
-        function closePasswordModal() {
-            document.getElementById('passwordModal').classList.add('hidden');
-        }
+        function closePasswordModal() { document.getElementById('passwordModal').classList.add('hidden'); }
 
         function validatePassword() {
             const pass = document.getElementById('adminPassword').value;
             if(pass === 'R2wDz0u&') {
                 closePasswordModal();
                 document.getElementById('adminModal').classList.remove('hidden');
-            } else {
-                alert('Senha incorreta!');
-            }
+            } else { alert('Senha incorreta!'); }
         }
 
-        function closeAdminModal() {
-            document.getElementById('adminModal').classList.add('hidden');
-        }
+        function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
 
         async function salvarItemManual() {
             const id = document.getElementById('editId').value;
@@ -581,10 +631,7 @@
             const diaSemana = document.getElementById('manualDiaSemana').value;
             const categoria = document.getElementById('manualCategoria').value;
 
-            if(!data) {
-                alert('Preencha a Data!');
-                return;
-            }
+            if(!data) { alert('Preencha a Data!'); return; }
 
             const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
             const itemId = id ? id : (modoAtual === 'cgr' ? 'p_' : 'sup_') + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
@@ -596,7 +643,7 @@
                 novoObjeto.horario = document.getElementById('manualHorario').value;
                 novoObjeto.tratativa = document.getElementById('manualTratativa').value;
             } else {
-                novoObjeto.supervisor = document.getElementById('manualSupervisor').value.trim().toUpperCase();
+                novoObjeto.supervisor = document.getElementById('manualSupervisor').value;
                 novoObjeto.sigla = document.getElementById('manualSigla').value;
             }
 
@@ -606,9 +653,7 @@
                 resetForm();
                 if(modoAtual === 'cgr') carregarPlantoesFirebase();
                 else carregarSupervisoresFirebase();
-            } catch (error) {
-                alert('Erro ao salvar.');
-            }
+            } catch (error) { alert('Erro ao salvar.'); }
         }
 
         function prepararEdicao(id) {
@@ -643,7 +688,6 @@
             document.getElementById('manualData').value = '';
             document.getElementById('manualDiaSemana').value = 'Sábado';
             document.getElementById('manualCategoria').value = 'fds';
-            document.getElementById('manualSupervisor').value = '';
             document.getElementById('btnCancelEdit').classList.add('hidden');
             document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem`;
         }
@@ -652,10 +696,7 @@
             const rawText = document.getElementById('bulkData').value.trim();
             const isFeriadoChecked = document.getElementById('isFeriadoCheck').checked;
 
-            if(!rawText) {
-                alert('Cole os dados copiados na caixa de texto!');
-                return;
-            }
+            if(!rawText) { alert('Cole os dados copiados na caixa de texto!'); return; }
 
             const lines = rawText.split('\n').filter(l => l.trim() !== '');
             let addedCount = 0;
@@ -691,7 +732,6 @@
                             addedCount++;
                         }
                     } else {
-                        // Importação para Supervisores (ex: capturando nome e sigla SA ou ES)
                         let sigla = remainder.includes('ES') ? 'ES' : 'SA';
                         let supervisorNome = remainder.replace('SP', '').replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
 
@@ -711,9 +751,7 @@
                 document.getElementById('isFeriadoCheck').checked = false;
                 if(modoAtual === 'cgr') carregarPlantoesFirebase();
                 else carregarSupervisoresFirebase();
-            } else {
-                alert('Não foi possível processar os dados.');
-            }
+            } else { alert('Não foi possível processar os dados.'); }
         }
 
         async function deleteItem(id) {
@@ -723,18 +761,13 @@
                     await window.deleteDoc(window.doc(window.db, colecao, id));
                     if(modoAtual === 'cgr') carregarPlantoesFirebase();
                     else carregarSupervisoresFirebase();
-                } catch (error) {
-                    alert('Erro ao excluir.');
-                }
+                } catch (error) { alert('Erro ao excluir.'); }
             }
         }
 
         async function deleteAllItems() {
             const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-            if(dadosAtuais.length === 0) {
-                alert('Não há registros cadastrados para remover.');
-                return;
-            }
+            if(dadosAtuais.length === 0) { alert('Não há registros cadastrados para remover.'); return; }
 
             if(confirm('ATENÇÃO: Deseja excluir TODOS os registros da aba atual?')) {
                 try {
@@ -745,29 +778,7 @@
                     alert('Registros removidos com sucesso!');
                     if(modoAtual === 'cgr') carregarPlantoesFirebase();
                     else carregarSupervisoresFirebase();
-                } catch (error) {
-                    alert('Erro ao limpar.');
-                }
-            }
-        }
-
-        function openEquipeModal() { document.getElementById('equipeModal').classList.remove('hidden'); }
-        function closeEquipeModal() { document.getElementById('equipeModal').classList.add('hidden'); }
-
-        async function adicionarMembroEquipe() {
-            const input = document.getElementById('novoEquipeNome');
-            const nome = input.value.trim().toUpperCase();
-            if(!nome) return alert('Digite o nome!');
-            const id = 'eq_' + Date.now();
-            await window.setDoc(window.doc(window.db, "equipe", id), { nome });
-            input.value = '';
-            carregarEquipeFirebase();
-        }
-
-        async function removerMembroEquipe(id) {
-            if(confirm('Remover membro da equipe?')) {
-                await window.deleteDoc(window.doc(window.db, "equipe", id));
-                carregarEquipeFirebase();
+                } catch (error) { alert('Erro ao limpar.'); }
             }
         }
 
