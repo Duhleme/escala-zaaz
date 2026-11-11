@@ -52,13 +52,16 @@
     <svg viewBox="0 0 500 500" class="w-full h-full object-contain">
         <!-- Fundo Hexágono Amarelo -->
         <polygon points="250,30 430,135 430,365 250,470 70,365 70,135" fill="#f4b223" />
-        <!-- Desenho Interno (Camadas) -->
-        <g fill="none" stroke="#2c2560" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M250,110 L370,170 L250,230 L130,170 Z" />
-            <path d="M130,235 L250,295 L370,235" />
-            <path d="M130,300 L250,360 L250,400 L220,385 L130,300 Z" />
-            <path d="M210,135 L200,105" />
-            <path d="M290,135 L300,105" />
+        <!-- Desenho Interno Corrigido -->
+        <g fill="none" stroke="#2c2560" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Topo / Antenas -->
+            <path d="M200,140 L200,115 M300,140 L300,115" />
+            <!-- Camada Superior -->
+            <path d="M250,130 L350,185 L250,240 L150,185 Z" />
+            <!-- Camada do Meio -->
+            <path d="M165,255 L250,300 L335,255" />
+            <!-- Camada Inferior / Ponto debaixo -->
+            <path d="M165,315 L250,360 L250,395 L220,380 L165,315" />
         </g>
     </svg>
 </div>
