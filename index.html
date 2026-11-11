@@ -581,7 +581,7 @@
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-1.5">
                             <span class="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} -${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
+                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} - ${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
                         </div>
                         <div class="font-semibold text-gray-800 text-sm mb-1"><i class="fa-solid fa-user-tie text-blue-600"></i> ${p.supervisor}</div>
                         <div class="text-xs text-gray-500">Região: SP</div>
@@ -777,4 +777,25 @@
             }
         }
 
-        async`
+        async function deleteAllItems() {
+            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
+            if(dadosAtuais.length === 0) { alert('Não há registros cadastrados para remover.'); return; }
+
+            if(confirm('ATENÇÃO: Deseja excluir TODOS os registros da aba atual?')) {
+                try {
+                    const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
+                    for (let item of dadosAtuais) {
+                        await window.deleteDoc(window.doc(window.db, colecao, item.id));
+                    }
+                    alert('Registros removidos com sucesso!');
+                    if(modoAtual === 'cgr') carregarPlantoesFirebase();
+                    else carregarSupervisoresFirebase();
+                } catch (error) { alert('Erro ao limpar.'); }
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', render);
+        document.getElementById('filterDate').addEventListener('input', render);
+    </script>
+</body>
+</html>
