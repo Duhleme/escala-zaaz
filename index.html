@@ -52,7 +52,7 @@
         <header class="bg-blue-900 dark:bg-gray-950 text-white shadow-md border-b border-blue-800 dark:border-gray-800">
             <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-1 rounded-lg flex items-center justify-center w-12 h-12 overflow-hidden">
+                    <div class="p-1 rounded-lg flex items-center justify-center w-12 h-12 overflow-hidden bg-white/10">
                         <img src="logo.png" alt="Logo ZaaZ" class="w-full h-full object-contain">
                     </div>
                     <div>
@@ -727,11 +727,10 @@
 
             const nomeColaborador = modoAtual === 'cgr' ? document.getElementById('manualPlantonista').value : document.getElementById('manualSupervisor').value;
 
-            // Alerta visual de conflito se já estiver escalado no mesmo dia
             const conflitoEncontrado = verificarConflito(nomeColaborador, data, id);
             if (conflitoEncontrado) {
                 const continuar = confirm(`⚠️ ATENÇÃO DE CONFLITO:\n\nO colaborador "${nomeColaborador}" já possui um registro escalado no dia ${data}!\n\nDeseja salvar mesmo assim?`);
-                if (!continueSalvar = continuar) return;
+                if (!continuar) return;
             }
 
             const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
@@ -867,7 +866,6 @@
                                 novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
                             }
 
-                            // Verifica conflito na importação em massa
                             if (verificarConflito(novoObjeto.plantonista, dateStr, null)) {
                                 conflitosCount++;
                             }
