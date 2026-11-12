@@ -794,6 +794,7 @@
                             .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
                             .trim();
 
+                        // Remove a palavra Monitoramento ou tratativa antiga se vier colada no texto copiado
                         if (plantonista.includes('Monitoramento')) {
                             plantonista = plantonista.split('Monitoramento')[0].trim();
                         }
@@ -802,7 +803,11 @@
                             novoObjeto.plantonista = plantonista.toUpperCase();
                             novoObjeto.horario = horario;
 
-                            if (horario.startsWith('22:00')) {
+                            // --- DETECÇÃO INTELIGENTE DE TRATATIVA ---
+                            let linhaMaiuscula = line.toUpperCase();
+                            if (linhaMaiuscula.includes('GPON')) {
+                                novoObjeto.tratativa = 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo';
+                            } else if (linhaMaiuscula.includes('NOTURNO') || horario.startsWith('22:00')) {
                                 novoObjeto.tratativa = 'Monitoramento Noturno';
                             } else {
                                 novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
@@ -839,7 +844,6 @@
                 else carregarSupervisoresFirebase();
             } else { alert('Não foi possível processar os dados.'); }
         }
-
         async function deleteItem(id) {
             if(confirm('Tem certeza que deseja remover este registro?')) {
                 try {
