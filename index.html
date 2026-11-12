@@ -1,940 +1,927 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional - ZaaZ Telecom</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
+<script>
+    tailwind.config = { darkMode: 'class' }
+</script>
 
-    <!-- Firebase SDKs integrados -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<!-- Firebase SDKs integrados -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBhIU3NgskfDTcLRjQ9fEnuCdb_4ArG020",
-            authDomain: "escalaplatoes.firebaseapp.com",
-            projectId: "escalaplatoes",
-            storageBucket: "escalaplatoes.firebasestorage.app",
-            messagingSenderId: "228777596428",
-            appId: "1:228777596428:web:d90a6e39900ba9a9ee8029",
-            measurementId: "G-2QTPXHFWV1"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhIU3NgskfDTcLRjQ9fEnuCdb_4ArG020",
+        authDomain: "escalaplatoes.firebaseapp.com",
+        projectId: "escalaplatoes",
+        storageBucket: "escalaplatoes.firebasestorage.app",
+        messagingSenderId: "228777596428",
+        appId: "1:228777596428:web:d90a6e39900ba9a9ee8029",
+        measurementId: "G-2QTPXHFWV1"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        window.db = db;
-        window.collection = collection;
-        window.getDocs = getDocs;
-        window.setDoc = setDoc;
-        window.doc = doc;
-        window.deleteDoc = deleteDoc;
+    window.db = db;
+    window.collection = collection;
+    window.getDocs = getDocs;
+    window.setDoc = setDoc;
+    window.doc = doc;
+    window.deleteDoc = deleteDoc;
 
-        window.carregarPlantoesFirebase();
-        window.carregarSupervisoresFirebase();
-        window.carregarEquipeCgrFirebase();
-        window.carregarEquipeSupFirebase();
-    </script>
+    window.carregarPlantoesFirebase();
+    window.carregarSupervisoresFirebase();
+    window.carregarEquipeCgrFirebase();
+    window.carregarEquipeSupFirebase();
+</script>
 
-    <style>body { font-family: 'Inter', sans-serif; }</style>
-</head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col justify-between transition-colors duration-200">
+<style>body { font-family: 'Inter', sans-serif; }</style>
 
-    <div>
-        <!-- Header -->
-        <header class="bg-blue-900 dark:bg-gray-950 text-white shadow-md border-b border-blue-800 dark:border-gray-800">
-            <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-1 rounded-lg flex items-center justify-center w-12 h-12 overflow-hidden bg-white/10">
-                        <img src="logo.png" alt="Logo ZaaZ" class="w-full h-full object-contain">
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold tracking-tight">ZaaZ Telecom - Painel Operacional</h1>
-                        <p id="subHeaderTitle" class="text-xs text-blue-200 dark:text-gray-400">Escala CGR (Fins de Semana e Feriados)</p>
-                    </div>
+
+<div>
+    <!-- Header -->
+    <header class="bg-blue-900 dark:bg-gray-950 text-white shadow-md border-b border-blue-800 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-1 rounded-lg flex items-center justify-center w-12 h-12 overflow-hidden bg-white/10">
+                    <img src="logo.png.png" alt="Logo ZaaZ" class="w-full h-full object-contain">
                 </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">ZaaZ Telecom - Painel Operacional</h1>
+                    <p id="subHeaderTitle" class="text-xs text-blue-200 dark:text-gray-400">Escala CGR (Fins de Semana e Feriados)</p>
+                </div>
+            </div>
 
-                <!-- Botões de Alternância e Ações -->
-                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-                    <!-- Botão Dark Mode -->
-                    <button onclick="toggleDarkMode()" class="bg-blue-800/60 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 text-white p-2.5 rounded-xl text-sm shadow transition" title="Alternar Modo Escuro">
-                        <i id="themeIcon" class="fa-solid fa-moon"></i>
+            <!-- Botões de Alternância e Ações -->
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                <!-- Botão Dark Mode -->
+                <button onclick="toggleDarkMode()" class="bg-blue-800/60 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 text-white p-2.5 rounded-xl text-sm shadow transition" title="Alternar Modo Escuro">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                </button>
+
+                <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-xl flex gap-1 border border-blue-800 dark:border-gray-800">
+                    <button id="btnTabCgr" onclick="mudarPainel('cgr')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-headset"></i> CGR
                     </button>
-
-                    <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-xl flex gap-1 border border-blue-800 dark:border-gray-800">
-                        <button id="btnTabCgr" onclick="mudarPainel('cgr')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-headset"></i> CGR
-                        </button>
-                        <button id="btnTabSup" onclick="mudarPainel('sup')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-user-tie"></i> Supervisores
-                        </button>
-                    </div>
-
-                    <div class="relative w-full sm:w-44">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-                            <i class="fa-solid fa-search"></i>
-                        </span>
-                        <input type="text" id="searchInput" placeholder="Buscar..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    </div>
-
-                    <input type="text" id="filterDate" placeholder="Filtrar Data (Ex: 22/11)" class="w-full sm:w-36 px-3 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-
-                    <button onclick="checkAdminAccess()" class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-lock"></i> Painel Admin
+                    <button id="btnTabSup" onclick="mudarPainel('sup')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-tie"></i> Supervisores
                     </button>
                 </div>
-            </div>
-        </header>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 py-8 w-full">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                    <div>
-                        <p id="labelCard1" class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fins de Semana Escalados</p>
-                        <h3 id="countFds" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">0</h3>
-                    </div>
-                    <div id="iconCard1Bg" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 p-3 rounded-lg"><i id="iconCard1" class="fa-solid fa-mug-hot text-xl"></i></div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                    <div>
-                        <p id="labelCard2" class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Feriados Escalados</p>
-                        <h3 id="countFeriados" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">0</h3>
-                    </div>
-                    <div class="bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 p-3 rounded-lg"><i class="fa-solid fa-star text-xl"></i></div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
-                    <div id="headerList1" class="p-4 border-b border-gray-100 dark:border-gray-700 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-t-xl flex justify-between items-center">
-                        <h2 id="titleList1" class="font-semibold text-indigo-900 dark:text-indigo-300 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana
-                        </h2>
-                        <span id="badgeFds" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
-                    </div>
-                    <div id="listFds" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+                <!-- Barra de Busca Unificada -->
+                <div class="relative w-full sm:w-64">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" placeholder="Buscar nome, data ou dia..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
-                    <div id="headerList2" class="p-4 border-b border-gray-100 dark:border-gray-700 bg-amber-50/50 dark:bg-amber-950/40 rounded-t-xl flex justify-between items-center">
-                        <h2 id="titleList2" class="font-semibold text-amber-900 dark:text-amber-300 flex items-center gap-2">
-                            <i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados
-                        </h2>
-                        <span id="badgeFeriados" class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
-                    </div>
-                    <div id="listFeriados" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Footer com Assinatura -->
-    <footer class="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-12 py-4 text-center text-xs text-gray-500 dark:text-gray-400">
-        ZaaZ Telecom &copy; 2026 - Painel Operacional | Desenvolvido por <span class="font-semibold text-blue-900 dark:text-blue-400">Eduardo Leme</span>
-    </footer>
-
-    <!-- Modal de Senha -->
-    <div id="passwordModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4 border dark:border-gray-700">
-            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2"><i class="fa-solid fa-lock text-blue-600"></i> Acesso Restrito</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Digite a senha administrativa:</p>
-            <input type="password" id="adminPassword" placeholder="Senha" class="w-full border dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closePasswordModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium">Cancelar</button>
-                <button onclick="validatePassword()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500">Entrar</button>
+                <button onclick="checkAdminAccess()" class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-lock"></i> Painel Admin
+                </button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Modal Pop-up para Gerenciar Equipe -->
-    <div id="equipeModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 border dark:border-gray-700">
-            <div class="flex justify-between items-center border-b dark:border-gray-700 pb-3">
-                <h3 id="equipeModalTitle" class="font-bold text-sm text-indigo-900 dark:text-indigo-300 flex items-center gap-2">
-                    <i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe
-                </h3>
-                <button onclick="closeEquipeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <div class="space-y-3">
-                <div class="flex gap-2">
-                    <input type="text" id="novoEquipeNome" placeholder="Nome completo..." class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    <button onclick="adicionarMembroEquipe()" class="px-3 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 shadow whitespace-nowrap">
-                        <i class="fa-solid fa-plus"></i> Adicionar
-                    </button>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <p id="labelCard1" class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fins de Semana Escalados</p>
+                    <h3 id="countFds" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">0</h3>
                 </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium pt-1">Membros cadastrados atualmente:</div>
-                <div id="listaEquipeTags" class="flex flex-wrap gap-2 max-h-56 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"></div>
+                <div id="iconCard1Bg" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 p-3 rounded-lg"><i id="iconCard1" class="fa-solid fa-mug-hot text-xl"></i></div>
             </div>
-
-            <div class="flex justify-end pt-2 border-t dark:border-gray-700">
-                <button onclick="closeEquipeModal()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-xs font-semibold rounded-lg hover:bg-gray-700">Concluído</button>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <p id="labelCard2" class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Feriados Escalados</p>
+                    <h3 id="countFeriados" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">0</h3>
+                </div>
+                <div class="bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 p-3 rounded-lg"><i class="fa-solid fa-star text-xl"></i></div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Painel Administrativo -->
-    <div id="adminModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border dark:border-gray-700">
-            <div class="bg-blue-900 dark:bg-gray-950 text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-b dark:border-gray-800">
-                <h3 id="adminModalTitle" class="font-bold text-lg"><i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR</h3>
-                
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-lg flex gap-1 border border-blue-800 dark:border-gray-800">
-                        <button id="adminBtnCgr" onclick="mudarPainel('cgr')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1">
-                            <i class="fa-solid fa-headset"></i> CGR
-                        </button>
-                        <button id="adminBtnSup" onclick="mudarPainel('sup')" class="px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1">
-                            <i class="fa-solid fa-user-tie"></i> Supervisores
-                        </button>
-                    </div>
-
-                    <button onclick="closeAdminModal()" class="text-blue-200 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
+                <div id="headerList1" class="p-4 border-b border-gray-100 dark:border-gray-700 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-t-xl flex justify-between items-center">
+                    <h2 id="titleList1" class="font-semibold text-indigo-900 dark:text-indigo-300 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana
+                    </h2>
+                    <span id="badgeFds" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
                 </div>
+                <div id="listFds" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
             </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
+                <div id="headerList2" class="p-4 border-b border-gray-100 dark:border-gray-700 bg-amber-50/50 dark:bg-amber-950/40 rounded-t-xl flex justify-between items-center">
+                    <h2 id="titleList2" class="font-semibold text-amber-900 dark:text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados
+                    </h2>
+                    <span id="badgeFeriados" class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+                </div>
+                <div id="listFeriados" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Footer com Assinatura -->
+<footer class="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-12 py-4 text-center text-xs text-gray-500 dark:text-gray-400">
+    ZaaZ Telecom &copy; 2026 - Painel Operacional | Desenvolvido por <span class="font-semibold text-blue-900 dark:text-blue-400">Eduardo Leme</span>
+</footer>
+
+<!-- Modal de Senha -->
+<div id="passwordModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4 border dark:border-gray-700">
+        <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2"><i class="fa-solid fa-lock text-blue-600"></i> Acesso Restrito</h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Digite a senha administrativa:</p>
+        <input type="password" id="adminPassword" placeholder="Senha" class="w-full border dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <div class="flex justify-end gap-2 pt-2">
+            <button onclick="closePasswordModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium">Cancelar</button>
+            <button onclick="validatePassword()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500">Entrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pop-up para Gerenciar Equipe -->
+<div id="equipeModal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 border dark:border-gray-700">
+        <div class="flex justify-between items-center border-b dark:border-gray-700 pb-3">
+            <h3 id="equipeModalTitle" class="font-bold text-sm text-indigo-900 dark:text-indigo-300 flex items-center gap-2">
+                <i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe
+            </h3>
+            <button onclick="closeEquipeModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        
+        <div class="space-y-3">
+            <div class="flex gap-2">
+                <input type="text" id="novoEquipeNome" placeholder="Nome completo..." class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <button onclick="adicionarMembroEquipe()" class="px-3 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-500 shadow whitespace-nowrap">
+                    <i class="fa-solid fa-plus"></i> Adicionar
+                </button>
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium pt-1">Membros cadastrados atualmente:</div>
+            <div id="listaEquipeTags" class="flex flex-wrap gap-2 max-h-56 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"></div>
+        </div>
+
+        <div class="flex justify-end pt-2 border-t dark:border-gray-700">
+            <button onclick="closeEquipeModal()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-xs font-semibold rounded-lg hover:bg-gray-700">Concluído</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Painel Administrativo -->
+<div id="adminModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border dark:border-gray-700">
+        <div class="bg-blue-900 dark:bg-gray-950 text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-b dark:border-gray-800">
+            <h3 id="adminModalTitle" class="font-bold text-lg"><i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR</h3>
             
-            <div class="p-6 overflow-y-auto space-y-6 flex-grow dark:bg-gray-900">
-                <!-- Cadastro Manual -->
-                <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-xl border border-blue-100 dark:border-gray-700 space-y-4">
-                    <div class="flex justify-between items-center border-b border-blue-200 dark:border-gray-700 pb-2">
-                        <h4 id="formTitle" class="font-semibold text-sm text-blue-900 dark:text-blue-300 flex items-center gap-2">
-                            <i class="fa-solid fa-user-plus"></i> Inserir ou Editar Manualmente
-                        </h4>
-                        <button id="btnCancelEdit" onclick="resetForm()" class="hidden text-xs text-red-600 dark:text-red-400 font-semibold hover:underline"><i class="fa-solid fa-xmark"></i> Cancelar Edição</button>
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-lg flex gap-1 border border-blue-800 dark:border-gray-800">
+                    <button id="adminBtnCgr" onclick="mudarPainel('cgr')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1">
+                        <i class="fa-solid fa-headset"></i> CGR
+                    </button>
+                    <button id="adminBtnSup" onclick="mudarPainel('sup')" class="px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1">
+                        <i class="fa-solid fa-user-tie"></i> Supervisores
+                    </button>
+                </div>
+
+                <button onclick="closeAdminModal()" class="text-blue-200 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+        </div>
+        
+        <div class="p-6 overflow-y-auto space-y-6 flex-grow dark:bg-gray-900">
+            <!-- Cadastro Manual -->
+            <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-xl border border-blue-100 dark:border-gray-700 space-y-4">
+                <div class="flex justify-between items-center border-b border-blue-200 dark:border-gray-700 pb-2">
+                    <h4 id="formTitle" class="font-semibold text-sm text-blue-900 dark:text-blue-300 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Inserir ou Editar Manualmente
+                    </h4>
+                    <button id="btnCancelEdit" onclick="resetForm()" class="hidden text-xs text-red-600 dark:text-red-400 font-semibold hover:underline"><i class="fa-solid fa-xmark"></i> Cancelar Edição</button>
+                </div>
+
+                <input type="hidden" id="editId" value="">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Data (Ex: 22/11/2026)</label>
+                        <input type="text" id="manualData" placeholder="DD/MM/AAAA" maxlength="10" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
+                    <div>
+                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Categoria</label>
+                        <select id="manualCategoria" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="fds">Fim de Semana</option>
+                            <option value="feriados">Feriado</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Campo oculto para armazenar o dia da semana calculado automaticamente -->
+                <input type="hidden" id="manualDiaSemana" value="">
 
-                    <input type="hidden" id="editId" value="">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="containerCamposCgr">
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300">Plantonista</label>
+                            <button onclick="openEquipeModal('cgr')" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-gear"></i> Gerenciar Equipe
+                            </button>
+                        </div>
+                        <select id="manualPlantonista" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Horário</label>
+                        <select id="manualHorario" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="07:00-13:00 / 14:00-16:00">07:00-13:00 / 14:00-16:00</option>
+                            <option value="13:00-18:00 / 19:00-22:00">13:00-18:00 / 19:00-22:00</option>
+                            <option value="13:00-19:00 / 20:00-22:00">13:00-19:00 / 20:00-22:00</option>
+                            <option value="22:00-02:00 / 03:00-07:00">22:00-02:00 / 03:00-07:00</option>
+                        </select>
+                    </div>
+                </div>
 
+                <!-- Campos para Supervisores -->
+                <div class="space-y-3 hidden" id="containerCamposSup">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Data (Ex: 22/11/2026)</label>
-                            <input type="text" id="manualData" placeholder="DD/MM/AAAA" maxlength="10" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Categoria</label>
-                            <select id="manualCategoria" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="fds">Fim de Semana</option>
-                                <option value="feriados">Feriado</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- Campo oculto para armazenar o dia da semana calculado automaticamente -->
-                    <input type="hidden" id="manualDiaSemana" value="">
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="containerCamposCgr">
-                        <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="block text-xs font-medium text-blue-900 dark:text-blue-300">Plantonista</label>
-                                <button onclick="openEquipeModal('cgr')" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
+                                <label class="block text-xs font-medium text-blue-900 dark:text-blue-300">Supervisor</label>
+                                <button onclick="openEquipeModal('sup')" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
                                     <i class="fa-solid fa-gear"></i> Gerenciar Equipe
                                 </button>
                             </div>
-                            <select id="manualPlantonista" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+                            <select id="manualSupervisor" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Horário</label>
-                            <select id="manualHorario" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="07:00-13:00 / 14:00-16:00">07:00-13:00 / 14:00-16:00</option>
-                                <option value="13:00-18:00 / 19:00-22:00">13:00-18:00 / 19:00-22:00</option>
-                                <option value="13:00-19:00 / 20:00-22:00">13:00-19:00 / 20:00-22:00</option>
-                                <option value="22:00-02:00 / 03:00-07:00">22:00-02:00 / 03:00-07:00</option>
+                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Status / Turno (Sigla)</label>
+                            <select id="manualSigla" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="SA">SA - Sobreaviso</option>
+                                <option value="ES">ES - Escala / Plantão</option>
                             </select>
                         </div>
                     </div>
-
-                    <!-- Campos para Supervisores -->
-                    <div class="space-y-3 hidden" id="containerCamposSup">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <div class="flex justify-between items-center mb-1">
-                                    <label class="block text-xs font-medium text-blue-900 dark:text-blue-300">Supervisor</label>
-                                    <button onclick="openEquipeModal('sup')" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
-                                        <i class="fa-solid fa-gear"></i> Gerenciar Equipe
-                                    </button>
-                                </div>
-                                <select id="manualSupervisor" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Status / Turno (Sigla)</label>
-                                <select id="manualSigla" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                    <option value="SA">SA - Sobreaviso</option>
-                                    <option value="ES">ES - Escala / Plantão</option>
-                                </select>
-                            </div>
+                    <div>
+                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Regiões Atendidas:</label>
+                        <div class="flex items-center gap-4 bg-white dark:bg-gray-900 p-2.5 rounded-lg border border-blue-200 dark:border-gray-700 text-xs">
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="SP" class="w-4 h-4 text-blue-600 rounded"> SP</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="PR" class="w-4 h-4 text-blue-600 rounded"> PR</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="MG" class="w-4 h-4 text-blue-600 rounded"> MG</label>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Regiões Atendidas:</label>
-                            <div class="flex items-center gap-4 bg-white dark:bg-gray-900 p-2.5 rounded-lg border border-blue-200 dark:border-gray-700 text-xs">
-                                <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="SP" class="w-4 h-4 text-blue-600 rounded"> SP</label>
-                                <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="PR" class="w-4 h-4 text-blue-600 rounded"> PR</label>
-                                <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSup" value="MG" class="w-4 h-4 text-blue-600 rounded"> MG</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="containerTratativa" class="block">
-                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Tratativa</label>
-                        <select id="manualTratativa" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo</option>
-                            <option value="Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo</option>
-                            <option value="Monitoramento Noturno">Monitoramento Noturno</option>
-                        </select>
-                    </div>
-
-                    <div class="flex justify-end pt-1">
-                        <button onclick="salvarItemManual()" id="btnSalvarManual" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem
-                        </button>
                     </div>
                 </div>
 
-                <!-- Seção de Importação em Massa -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
-                    <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa (Excel / Google Sheets)
-                    </h4>
-                    <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas copiadas direto da planilha..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
-                    
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
-                        <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                            <input type="checkbox" id="isFeriadoCheck" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <span class="text-xs font-semibold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
-                        </label>
-
-                        <button onclick="importExcelBulk()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 shadow">Processar Lote e Salvar</button>
-                    </div>
+                <div id="containerTratativa" class="block">
+                    <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Tratativa</label>
+                    <select id="manualTratativa" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo</option>
+                        <option value="Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo</option>
+                        <option value="Monitoramento Noturno">Monitoramento Noturno</option>
+                    </select>
                 </div>
 
-                <!-- Tabela de Gestão -->
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300" id="adminTableTitle">Registros Cadastrados na Nuvem</h4>
-                        <button onclick="deleteAllItems()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-trash-can"></i> Limpar Todos
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl max-h-64">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="sticky top-0 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 uppercase">
-                                <tr>
-                                    <th class="p-3">Data</th>
-                                    <th class="p-3">Tipo</th>
-                                    <th class="p-3" id="thColNome">Plantonista</th>
-                                    <th class="p-3" id="thColDetalhe">Horário</th>
-                                    <th class="p-3 text-right">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
-                        </table>
-                    </div>
+                <div class="flex justify-end pt-1">
+                    <button onclick="salvarItemManual()" id="btnSalvarManual" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500 shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem
+                    </button>
                 </div>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-900 px-6 py-3 border-t border-gray-200 dark:border-gray-800 flex justify-end">
-                <button onclick="closeAdminModal()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-700">Fechar Painel</button>
+
+            <!-- Seção de Importação em Massa -->
+            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+                <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa (Excel / Google Sheets)
+                </h4>
+                <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas copiadas direto da planilha..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <input type="checkbox" id="isFeriadoCheck" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
+                    </label>
+
+                    <button onclick="importExcelBulk()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 shadow">Processar Lote e Salvar</button>
+                </div>
+            </div>
+
+            <!-- Tabela de Gestão -->
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300" id="adminTableTitle">Registros Cadastrados na Nuvem</h4>
+                    <button onclick="deleteAllItems()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can"></i> Limpar Todos
+                    </button>
+                </div>
+                <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl max-h-64">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="sticky top-0 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 uppercase">
+                            <tr>
+                                <th class="p-3">Data</th>
+                                <th class="p-3">Tipo</th>
+                                <th class="p-3" id="thColNome">Plantonista</th>
+                                <th class="p-3" id="thColDetalhe">Horário</th>
+                                <th class="p-3 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
+        <div class="bg-gray-50 dark:bg-gray-900 px-6 py-3 border-t border-gray-200 dark:border-gray-800 flex justify-end">
+            <button onclick="closeAdminModal()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-700">Fechar Painel</button>
+        </div>
     </div>
+</div>
 
-    <script>
-        let modoAtual = 'cgr'; // 'cgr' ou 'sup'
-        let tipoEquipeAtual = 'cgr';
-        let plantoes = [];
-        let supervisores = [];
-        let equipeCgr = [];
-        let equipeSup = [];
+<script>
+    let modoAtual = 'cgr'; // 'cgr' ou 'sup'
+    let tipoEquipeAtual = 'cgr';
+    let plantoes = [];
+    let supervisores = [];
+    let equipeCgr = [];
+    let equipeSup = [];
 
-        // Controle de Tema (Dark Mode)
-        function toggleDarkMode() {
-            const html = document.documentElement;
+    // Controle de Tema (Dark Mode)
+    function toggleDarkMode() {
+        const html = document.documentElement;
+        const icon = document.getElementById('themeIcon');
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem('zaaz_theme', 'light');
+            icon.className = "fa-solid fa-moon";
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem('zaaz_theme', 'dark');
+            icon.className = "fa-solid fa-sun";
+        }
+    }
+
+    // Carrega o tema salvo ao iniciar
+    if (localStorage.getItem('zaaz_theme') === 'dark' || (!localStorage.getItem('zaaz_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.addEventListener('DOMContentLoaded', () => {
             const icon = document.getElementById('themeIcon');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('zaaz_theme', 'light');
-                icon.className = "fa-solid fa-moon";
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('zaaz_theme', 'dark');
-                icon.className = "fa-solid fa-sun";
-            }
-        }
-
-        // Carrega o tema salvo ao iniciar
-        if (localStorage.getItem('zaaz_theme') === 'dark' || (!localStorage.getItem('zaaz_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            document.addEventListener('DOMContentLoaded', () => {
-                const icon = document.getElementById('themeIcon');
-                if(icon) icon.className = "fa-solid fa-sun";
-            });
-        }
-
-        // Máscara automática para a Data e cálculo instantâneo do Dia da Semana
-        document.getElementById('manualData').addEventListener('input', function (e) {
-            let v = e.target.value.replace(/\D/g, '');
-            if (v.length > 8) v = v.slice(0, 8);
-            if (v.length > 4) {
-                v = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
-            } else if (v.length > 2) {
-                v = v.replace(/^(\d{2})(\d{0,2})/, '$1/$2');
-            }
-            e.target.value = v;
-
-            if (v.length === 10) {
-                document.getElementById('manualDiaSemana').value = obterDiaDaSemana(v);
-            }
+            if(icon) icon.className = "fa-solid fa-sun";
         });
+    }
 
-        // Descobre o dia da semana corretamente pelo padrão brasileiro (DD/MM/AAAA)
-        function obterDiaDaSemana(dataStr) {
-            const partes = dataStr.split('/');
-            if (partes.length !== 3) return 'Feriado';
-            const dataObj = new Date(partes[2], partes[1] - 1, partes[0]);
-            const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-            return dias[dataObj.getDay()] || 'Feriado';
+    // Máscara automática para a Data e cálculo instantâneo do Dia da Semana
+    document.getElementById('manualData').addEventListener('input', function (e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 8) v = v.slice(0, 8);
+        if (v.length > 4) {
+            v = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+        } else if (v.length > 2) {
+            v = v.replace(/^(\d{2})(\d{0,2})/, '$1/$2');
         }
+        e.target.value = v;
 
-        async function carregarPlantoesFirebase() {
-            try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "plantoes"));
-                plantoes = [];
-                querySnapshot.forEach((doc) => { plantoes.push({ id: doc.id, ...doc.data() }); });
-                if(modoAtual === 'cgr') render();
-            } catch (error) { console.error("Erro CGR:", error); }
+        if (v.length === 10) {
+            document.getElementById('manualDiaSemana').value = obterDiaDaSemana(v);
         }
+    });
 
-        async function carregarSupervisoresFirebase() {
-            try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "supervisores"));
-                supervisores = [];
-                querySnapshot.forEach((doc) => { supervisores.push({ id: doc.id, ...doc.data() }); });
-                if(modoAtual === 'sup') render();
-            } catch (error) { console.error("Erro Supervisores:", error); }
-        }
+    // Descobre o dia da semana corretamente pelo padrão brasileiro (DD/MM/AAAA)
+    function obterDiaDaSemana(dataStr) {
+        const partes = dataStr.split('/');
+        if (partes.length !== 3) return 'Feriado';
+        const dataObj = new Date(partes[2], partes[1] - 1, partes[0]);
+        const dias = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+        return dias[dataObj.getDay()] || 'Feriado';
+    }
 
-        async function carregarEquipeCgrFirebase() {
-            try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe_cgr"));
-                equipeCgr = [];
-                querySnapshot.forEach((doc) => { equipeCgr.push({ id: doc.id, ...doc.data() }); });
+    async function carregarPlantoesFirebase() {
+        try {
+            const querySnapshot = await window.getDocs(window.collection(window.db, "plantoes"));
+            plantoes = [];
+            querySnapshot.forEach((doc) => { plantoes.push({ id: doc.id, ...doc.data() }); });
+            if(modoAtual === 'cgr') render();
+        } catch (error) { console.error("Erro CGR:", error); }
+    }
 
-                if (equipeCgr.length === 0) {
-                    const padroes = ["EDUARDO LEME QUEIROZ", "MAIKY FREITAS RODRIGUES", "FRANCISCO ALVES PEREIRA JUNIOR", "RICCELI PESSOA MACHADO FIALHO", "LORIVAL LUIZ FERNANDES JUNIOR", "DIEGO AUGUSTO TEGANI"];
-                    for (let nome of padroes) {
-                        const id = 'eqc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-                        await window.setDoc(window.doc(window.db, "equipe_cgr", id), { nome });
-                        equipeCgr.push({ id, nome });
-                    }
+    async function carregarSupervisoresFirebase() {
+        try {
+            const querySnapshot = await window.getDocs(window.collection(window.db, "supervisores"));
+            supervisores = [];
+            querySnapshot.forEach((doc) => { supervisores.push({ id: doc.id, ...doc.data() }); });
+            if(modoAtual === 'sup') render();
+        } catch (error) { console.error("Erro Supervisores:", error); }
+    }
+
+    async function carregarEquipeCgrFirebase() {
+        try {
+            const querySnapshot = await window.getDocs(window.collection(window.db, "equipe_cgr"));
+            equipeCgr = [];
+            querySnapshot.forEach((doc) => { equipeCgr.push({ id: doc.id, ...doc.data() }); });
+
+            if (equipeCgr.length === 0) {
+                const padroes = ["EDUARDO LEME QUEIROZ", "MAIKY FREITAS RODRIGUES", "FRANCISCO ALVES PEREIRA JUNIOR", "RICCELI PESSOA MACHADO FIALHO", "LORIVAL LUIZ FERNANDES JUNIOR", "DIEGO AUGUSTO TEGANI"];
+                for (let nome of padroes) {
+                    const id = 'eqc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                    await window.setDoc(window.doc(window.db, "equipe_cgr", id), { nome });
+                    equipeCgr.push({ id, nome });
                 }
-                equipeCgr.sort((a, b) => a.nome.localeCompare(b.nome));
-                atualizarSelectCgr();
-            } catch (error) { console.error("Erro equipe CGR:", error); }
-        }
+            }
+            equipeCgr.sort((a, b) => a.nome.localeCompare(b.nome));
+            atualizarSelectCgr();
+        } catch (error) { console.error("Erro equipe CGR:", error); }
+    }
 
-        async function carregarEquipeSupFirebase() {
-            try {
-                const querySnapshot = await window.getDocs(window.collection(window.db, "equipe_sup"));
-                equipeSup = [];
-                querySnapshot.forEach((doc) => { equipeSup.push({ id: doc.id, ...doc.data() }); });
+    async function carregarEquipeSupFirebase() {
+        try {
+            const querySnapshot = await window.getDocs(window.collection(window.db, "equipe_sup"));
+            equipeSup = [];
+            querySnapshot.forEach((doc) => { equipeSup.push({ id: doc.id, ...doc.data() }); });
 
-                if (equipeSup.length === 0) {
-                    const padroesSup = ["WELLINGTON CAMARGO DOS SANTOS", "LUCAS AUGUSTO DE PAULA", "WESLEY SANTOS DO NASCIMENTO", "FABIO PEREIRA", "NIVALDO RODRIGUES DOS SANTOS"];
-                    for (let nome of padroesSup) {
-                        const id = 'eqs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-                        await window.setDoc(window.doc(window.db, "equipe_sup", id), { nome });
-                        equipeSup.push({ id, nome });
-                    }
+            if (equipeSup.length === 0) {
+                const padroesSup = ["WELLINGTON CAMARGO DOS SANTOS", "LUCAS AUGUSTO DE PAULA", "WESLEY SANTOS DO NASCIMENTO", "FABIO PEREIRA", "NIVALDO RODRIGUES DOS SANTOS"];
+                for (let nome of padroesSup) {
+                    const id = 'eqs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                    await window.setDoc(window.doc(window.db, "equipe_sup", id), { nome });
+                    equipeSup.push({ id, nome });
                 }
-                equipeSup.sort((a, b) => a.nome.localeCompare(b.nome));
-                atualizarSelectSup();
-            } catch (error) { console.error("Erro equipe Sup:", error); }
-        }
+            }
+            equipeSup.sort((a, b) => a.nome.localeCompare(b.nome));
+            atualizarSelectSup();
+        } catch (error) { console.error("Erro equipe Sup:", error); }
+    }
 
-        function atualizarSelectCgr() {
-            const select = document.getElementById('manualPlantonista');
-            if(!select) return;
-            select.innerHTML = '';
-            equipeCgr.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.nome; opt.innerText = m.nome;
-                select.appendChild(opt);
-            });
-        }
+    function atualizarSelectCgr() {
+        const select = document.getElementById('manualPlantonista');
+        if(!select) return;
+        select.innerHTML = '';
+        equipeCgr.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.nome; opt.innerText = m.nome;
+            select.appendChild(opt);
+        });
+    }
 
-        function atualizarSelectSup() {
-            const select = document.getElementById('manualSupervisor');
-            if(!select) return;
-            select.innerHTML = '';
-            equipeSup.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.nome; opt.innerText = m.nome;
-                select.appendChild(opt);
-            });
-        }
+    function atualizarSelectSup() {
+        const select = document.getElementById('manualSupervisor');
+        if(!select) return;
+        select.innerHTML = '';
+        equipeSup.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.nome; opt.innerText = m.nome;
+            select.appendChild(opt);
+        });
+    }
 
-        function abrirModalEquipeNaTela() {
-            const tagsContainer = document.getElementById('listaEquipeTags');
-            const modalTitle = document.getElementById('equipeModalTitle');
-            if(!tagsContainer) return;
+    function abrirModalEquipeNaTela() {
+        const tagsContainer = document.getElementById('listaEquipeTags');
+        const modalTitle = document.getElementById('equipeModalTitle');
+        if(!tagsContainer) return;
 
-            tagsContainer.innerHTML = '';
-            const listaAtiva = tipoEquipeAtual === 'cgr' ? equipeCgr : equipeSup;
-            modalTitle.innerHTML = `<i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe ${tipoEquipeAtual === 'cgr' ? 'CGR' : 'Supervisores'}`;
+        tagsContainer.innerHTML = '';
+        const listaAtiva = tipoEquipeAtual === 'cgr' ? equipeCgr : equipeSup;
+        modalTitle.innerHTML = `<i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe ${tipoEquipeAtual === 'cgr' ? 'CGR' : 'Supervisores'}`;
 
-            listaAtiva.forEach(m => {
-                const tag = document.createElement('div');
-                tag.className = "bg-white dark:bg-gray-800 border border-indigo-200 dark:border-gray-700 text-indigo-900 dark:text-indigo-300 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center justify-between gap-2 shadow-sm w-full";
-                tag.innerHTML = `
-                    <span>${m.nome}</span>
-                    <button onclick="removerMembroEquipe('${m.id}')" class="text-red-500 hover:text-red-700 font-bold" title="Remover"><i class="fa-solid fa-xmark"></i></button>
-                `;
-                tagsContainer.appendChild(tag);
-            });
-        }
+        listaAtiva.forEach(m => {
+            const tag = document.createElement('div');
+            tag.className = "bg-white dark:bg-gray-800 border border-indigo-200 dark:border-gray-700 text-indigo-900 dark:text-indigo-300 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center justify-between gap-2 shadow-sm w-full";
+            tag.innerHTML = `
+                <span>${m.nome}</span>
+                <button onclick="removerMembroEquipe('${m.id}')" class="text-red-500 hover:text-red-700 font-bold" title="Remover"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            tagsContainer.appendChild(tag);
+        });
+    }
 
-        function openEquipeModal(tipo) {
-            tipoEquipeAtual = tipo;
-            abrirModalEquipeNaTela();
-            document.getElementById('equipeModal').classList.remove('hidden');
-        }
+    function openEquipeModal(tipo) {
+        tipoEquipeAtual = tipo;
+        abrirModalEquipeNaTela();
+        document.getElementById('equipeModal').classList.remove('hidden');
+    }
 
-        function closeEquipeModal() { document.getElementById('equipeModal').classList.add('hidden'); }
+    function closeEquipeModal() { document.getElementById('equipeModal').classList.add('hidden'); }
 
-        async function adicionarMembroEquipe() {
-            const input = document.getElementById('novoEquipeNome');
-            const nome = input.value.trim().toUpperCase();
-            if(!nome) return alert('Digite o nome!');
+    async function adicionarMembroEquipe() {
+        const input = document.getElementById('novoEquipeNome');
+        const nome = input.value.trim().toUpperCase();
+        if(!nome) return alert('Digite o nome!');
 
+        const colecaoDb = tipoEquipeAtual === 'cgr' ? 'equipe_cgr' : 'equipe_sup';
+        const id = (tipoEquipeAtual === 'cgr' ? 'eqc_' : 'eqs_') + Date.now();
+        
+        await window.setDoc(window.doc(window.db, colecaoDb, id), { nome });
+        input.value = '';
+        
+        if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
+        else carregarEquipeSupFirebase();
+        abrirModalEquipeNaTela();
+    }
+
+    async function removerMembroEquipe(id) {
+        if(confirm('Remover membro da equipe?')) {
             const colecaoDb = tipoEquipeAtual === 'cgr' ? 'equipe_cgr' : 'equipe_sup';
-            const id = (tipoEquipeAtual === 'cgr' ? 'eqc_' : 'eqs_') + Date.now();
-            
-            await window.setDoc(window.doc(window.db, colecaoDb, id), { nome });
-            input.value = '';
+            await window.deleteDoc(window.doc(window.db, colecaoDb, id));
             
             if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
             else carregarEquipeSupFirebase();
             abrirModalEquipeNaTela();
         }
+    }
 
-        async function removerMembroEquipe(id) {
-            if(confirm('Remover membro da equipe?')) {
-                const colecaoDb = tipoEquipeAtual === 'cgr' ? 'equipe_cgr' : 'equipe_sup';
-                await window.deleteDoc(window.doc(window.db, colecaoDb, id));
-                
-                if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
-                else carregarEquipeSupFirebase();
-                abrirModalEquipeNaTela();
-            }
+    function mudarPainel(novoModo) {
+        modoAtual = novoModo;
+        const btnCgr = document.getElementById('btnTabCgr');
+        const btnSup = document.getElementById('btnTabSup');
+        const adminBtnCgr = document.getElementById('adminBtnCgr');
+        const adminBtnSup = document.getElementById('adminBtnSup');
+        const subHeader = document.getElementById('subHeaderTitle');
+        const label1 = document.getElementById('labelCard1');
+        const label2 = document.getElementById('labelCard2');
+        const title1 = document.getElementById('titleList1');
+        const title2 = document.getElementById('titleList2');
+        const adminTitle = document.getElementById('adminModalTitle');
+        const containerCgr = document.getElementById('containerCamposCgr');
+        const containerSup = document.getElementById('containerCamposSup');
+        const containerTratativa = document.getElementById('containerTratativa');
+        const thNome = document.getElementById('thColNome');
+        const thDetalhe = document.getElementById('thColDetalhe');
+
+        if (modoAtual === 'cgr') {
+            if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
+            if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
+            if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
+            if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
+
+            subHeader.innerText = "Escala CGR (Fins de Semana e Feriados)";
+            label1.innerText = "Fins de Semana Escalados";
+            label2.innerText = "Feriados Escalados";
+            title1.innerHTML = '<i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana';
+            title2.innerHTML = '<i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados';
+            adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR';
+            containerCgr.classList.remove('hidden');
+            containerSup.classList.add('hidden');
+            containerTratativa.classList.remove('hidden');
+            thNome.innerText = "Plantonista";
+            thDetalhe.innerText = "Horário";
+        } else {
+            if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
+            if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
+            if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
+            if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
+
+            subHeader.innerText = "Escala de Supervisores de Campo (Sábados, Domingos e Feriados)";
+            label1.innerText = "Fins de Semana Escalados";
+            label2.innerText = "Feriados Escalados";
+            title1.innerHTML = '<i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana';
+            title2.innerHTML = '<i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados';
+            adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Supervisores de Campo';
+            containerCgr.classList.add('hidden');
+            containerSup.classList.remove('hidden');
+            containerTratativa.classList.add('hidden');
+            thNome.innerText = "Supervisor";
+            thDetalhe.innerText = "Status / Turno";
         }
+        render();
+    }
 
-        function mudarPainel(novoModo) {
-            modoAtual = novoModo;
-            const btnCgr = document.getElementById('btnTabCgr');
-            const btnSup = document.getElementById('btnTabSup');
-            const adminBtnCgr = document.getElementById('adminBtnCgr');
-            const adminBtnSup = document.getElementById('adminBtnSup');
-            const subHeader = document.getElementById('subHeaderTitle');
-            const label1 = document.getElementById('labelCard1');
-            const label2 = document.getElementById('labelCard2');
-            const title1 = document.getElementById('titleList1');
-            const title2 = document.getElementById('titleList2');
-            const adminTitle = document.getElementById('adminModalTitle');
-            const containerCgr = document.getElementById('containerCamposCgr');
-            const containerSup = document.getElementById('containerCamposSup');
-            const containerTratativa = document.getElementById('containerTratativa');
-            const thNome = document.getElementById('thColNome');
-            const thDetalhe = document.getElementById('thColDetalhe');
+    function render() {
+        const termoBusca = document.getElementById('searchInput').value.toLowerCase().trim();
+        const list1 = document.getElementById('listFds');
+        const list2 = document.getElementById('listFeriados');
+        const adminTableBody = document.getElementById('adminTableBody');
 
+        if(!list1 || !list2) return;
+        list1.innerHTML = '';
+        list2.innerHTML = '';
+        adminTableBody.innerHTML = '';
+
+        let c1 = 0, c2 = 0;
+        const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
+
+        const filtered = dadosAtuais.filter(item => {
+            const nomeOuSup = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
+            const dataItem = item.data.toLowerCase();
+            const diaSemanaItem = item.diaSemana.toLowerCase();
+            
+            // Busca unificada: procura no nome, na data ou no dia da semana
+            return nomeOuSup.toLowerCase().includes(termoBusca) || 
+                   dataItem.includes(termoBusca) || 
+                   diaSemanaItem.includes(termoBusca);
+        });
+
+        // Ordenar sequencialmente por data (crescente)
+        filtered.sort((a, b) => {
+            const d1 = a.data.split('/').reverse().join('');
+            const d2 = b.data.split('/').reverse().join('');
+            return d1.localeCompare(d2);
+        });
+
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            let borderColor = "border-l-4 border-l-indigo-500";
+            if(p.categoria === 'feriados') borderColor = "border-l-4 border-l-amber-500";
+
+            card.className = `bg-white dark:bg-gray-800 p-3.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition ${borderColor}`;
+            
             if (modoAtual === 'cgr') {
-                if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
-                if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
-                if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
-                if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
-
-                subHeader.innerText = "Escala CGR (Fins de Semana e Feriados)";
-                label1.innerText = "Fins de Semana Escalados";
-                label2.innerText = "Feriados Escalados";
-                title1.innerHTML = '<i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana';
-                title2.innerHTML = '<i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados';
-                adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR';
-                containerCgr.classList.remove('hidden');
-                containerSup.classList.add('hidden');
-                containerTratativa.classList.remove('hidden');
-                thNome.innerText = "Plantonista";
-                thDetalhe.innerText = "Horário";
-            } else {
-                if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
-                if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
-                if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
-                if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
-
-                subHeader.innerText = "Escala de Supervisores de Campo (Sábados, Domingos e Feriados)";
-                label1.innerText = "Fins de Semana Escalados";
-                label2.innerText = "Feriados Escalados";
-                title1.innerHTML = '<i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana';
-                title2.innerHTML = '<i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados';
-                adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Supervisores de Campo';
-                containerCgr.classList.add('hidden');
-                containerSup.classList.remove('hidden');
-                containerTratativa.classList.add('hidden');
-                thNome.innerText = "Supervisor";
-                thDetalhe.innerText = "Status / Turno";
-            }
-            render();
-        }
-
-        function render() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const filterDate = document.getElementById('filterDate').value.toLowerCase();
-            const list1 = document.getElementById('listFds');
-            const list2 = document.getElementById('listFeriados');
-            const adminTableBody = document.getElementById('adminTableBody');
-
-            if(!list1 || !list2) return;
-            list1.innerHTML = '';
-            list2.innerHTML = '';
-            adminTableBody.innerHTML = '';
-
-            let c1 = 0, c2 = 0;
-            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-
-            const filtered = dadosAtuais.filter(item => {
-                const nomeOuSup = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
-                const matchSearch = nomeOuSup.toLowerCase().includes(search) || 
-                                    item.diaSemana.toLowerCase().includes(search);
-                const matchDate = item.data.toLowerCase().includes(filterDate);
-                return matchSearch && matchDate;
-            });
-
-            // Ordenar sequencialmente por data (crescente)
-            filtered.sort((a, b) => {
-                const d1 = a.data.split('/').reverse().join('');
-                const d2 = b.data.split('/').reverse().join('');
-                return d1.localeCompare(d2);
-            });
-
-            filtered.forEach(p => {
-                const card = document.createElement('div');
-                let borderColor = "border-l-4 border-l-indigo-500";
-                if(p.categoria === 'feriados') borderColor = "border-l-4 border-l-amber-500";
-
-                card.className = `bg-white dark:bg-gray-800 p-3.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition ${borderColor}`;
-                
-                if (modoAtual === 'cgr') {
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-1.5">
-                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
-                        </div>
-                        <div class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1">${p.plantonista}</div>
-                        <div class="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${p.horario}</div>
-                        <div class="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 p-2 rounded">${p.tratativa}</div>
-                    `;
-                } else {
-                    const badgeSigla = p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
-                    const regioesExibidas = p.regioes ? p.regioes : 'SP';
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-1.5">
-                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} - ${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
-                        </div>
-                        <div class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1"><i class="fa-solid fa-user-tie text-blue-600 dark:text-blue-400"></i> ${p.supervisor}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">Região: ${regioesExibidas}</div>
-                    `;
-                }
-
-                if(p.categoria === 'fds') {
-                    list1.appendChild(card);
-                    c1++;
-                } else if(p.categoria === 'feriados') {
-                    list2.appendChild(card);
-                    c2++;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50";
-                const colNomeVal = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
-                const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
-
-                tr.innerHTML = `
-                    <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${p.data} (${p.diaSemana})</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'}">${p.categoria.toUpperCase()}</span></td>
-                    <td class="p-3 text-gray-700 dark:text-gray-300">${colNomeVal}</td>
-                    <td class="p-3 text-gray-500 dark:text-gray-400">${colDetalheVal}</td>
-                    <td class="p-3 text-right space-x-2">
-                        <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteItem('${p.id}')" class="text-red-600 dark:text-red-400 hover:text-red-800 font-medium" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                    </td>
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5">
+                        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
+                    </div>
+                    <div class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1">${p.plantonista}</div>
+                    <div class="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${p.horario}</div>
+                    <div class="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 p-2 rounded">${p.tratativa}</div>
                 `;
-                adminTableBody.appendChild(tr);
+            } else {
+                const badgeSigla = p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
+                const regioesExibidas = p.regioes ? p.regioes : 'SP';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-1.5">
+                        <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
+                        <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} - ${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
+                    </div>
+                    <div class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1"><i class="fa-solid fa-user-tie text-blue-600 dark:text-blue-400"></i> ${p.supervisor}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">Região: ${regioesExibidas}</div>
+                `;
+            }
+
+            if(p.categoria === 'fds') {
+                list1.appendChild(card);
+                c1++;
+            } else if(p.categoria === 'feriados') {
+                list2.appendChild(card);
+                c2++;
+            }
+
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50";
+            const colNomeVal = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
+            const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
+
+            tr.innerHTML = `
+                <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${p.data} (${p.diaSemana})</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'}">${p.categoria.toUpperCase()}</span></td>
+                <td class="p-3 text-gray-700 dark:text-gray-300">${colNomeVal}</td>
+                <td class="p-3 text-gray-500 dark:text-gray-400">${colDetalheVal}</td>
+                <td class="p-3 text-right space-x-2">
+                    <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button onclick="deleteItem('${p.id}')" class="text-red-600 dark:text-red-400 hover:text-red-800 font-medium" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            adminTableBody.appendChild(tr);
+        });
+
+        document.getElementById('countFds').innerText = c1;
+        document.getElementById('countFeriados').innerText = c2;
+        document.getElementById('badgeFds').innerText = c1;
+        document.getElementById('badgeFeriados').innerText = c2;
+    }
+
+    function checkAdminAccess() {
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('passwordModal').classList.remove('hidden');
+    }
+
+    function closePasswordModal() { document.getElementById('passwordModal').classList.add('hidden'); }
+
+    function validatePassword() {
+        const pass = document.getElementById('adminPassword').value;
+        if(pass === 'R2wDz0u&') {
+            closePasswordModal();
+            document.getElementById('adminModal').classList.remove('hidden');
+        } else { alert('Senha incorreta!'); }
+    }
+
+    function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+    // --- VERIFICAÇÃO DE CONFLITO DE ESCALA ---
+    function verificarConflito(nome, data, idAtual) {
+        const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
+        const campoNome = modoAtual === 'cgr' ? 'plantonista' : 'supervisor';
+
+        const conflito = dadosAtuais.find(item => 
+            item.id !== idAtual && 
+            item.data === data && 
+            item[campoNome].toUpperCase() === nome.toUpperCase()
+        );
+
+        return conflito;
+    }
+
+    async function salvarItemManual() {
+        const id = document.getElementById('editId').value;
+        const data = document.getElementById('manualData').value.trim();
+        const diaSemana = document.getElementById('manualDiaSemana').value;
+        const categoria = document.getElementById('manualCategoria').value;
+
+        if(!data) { alert('Preencha a Data!'); return; }
+
+        const nomeColaborador = modoAtual === 'cgr' ? document.getElementById('manualPlantonista').value : document.getElementById('manualSupervisor').value;
+
+        const conflitoEncontrado = verificarConflito(nomeColaborador, data, id);
+        if (conflitoEncontrado) {
+            const continuar = confirm(`⚠️ ATENÇÃO DE CONFLITO:\n\nO colaborador "${nomeColaborador}" já possui um registro escalado no dia ${data}!\n\nDeseja salvar mesmo assim?`);
+            if (!continuar) return;
+        }
+
+        const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
+        const itemId = id ? id : (modoAtual === 'cgr' ? 'p_' : 'sup_') + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
+        let novoObjeto = { categoria, data, diaSemana };
+
+        if (modoAtual === 'cgr') {
+            novoObjeto.plantonista = nomeColaborador;
+            novoObjeto.horario = document.getElementById('manualHorario').value;
+            novoObjeto.tratativa = document.getElementById('manualTratativa').value;
+        } else {
+            novoObjeto.supervisor = nomeColaborador;
+            novoObjeto.sigla = document.getElementById('manualSigla').value;
+            
+            const checkboxes = document.querySelectorAll('input[name="regiaoSup"]:checked');
+            let regioesSelecionadas = Array.from(checkboxes).map(cb => cb.value);
+            novoObjeto.regioes = regioesSelecionadas.length > 0 ? regioesSelecionadas.join(', ') : 'SP';
+        }
+
+        try {
+            await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
+            alert(id ? 'Registro atualizado com sucesso!' : 'Cadastrado com sucesso na nuvem!');
+            resetForm();
+            if(modoAtual === 'cgr') carregarPlantoesFirebase();
+            else carregarSupervisoresFirebase();
+        } catch (error) { alert('Erro ao salvar.'); }
+    }
+
+    function prepararEdicao(id) {
+        const colecaoDados = modoAtual === 'cgr' ? plantoes : supervisores;
+        const p = colecaoDados.find(item => item.id === id);
+        if(!p) return;
+
+        document.getElementById('editId').value = p.id;
+        document.getElementById('manualData').value = p.data;
+        document.getElementById('manualCategoria').value = p.categoria;
+        document.getElementById('manualDiaSemana').value = p.diaSemana;
+
+        if (modoAtual === 'cgr') {
+            document.getElementById('manualPlantonista').value = p.plantonista;
+            document.getElementById('manualHorario').value = p.horario;
+            document.getElementById('manualTratativa').value = p.tratativa;
+        } else {
+            document.getElementById('manualSupervisor').value = p.supervisor;
+            document.getElementById('manualSigla').value = p.sigla;
+            
+            const regioesArr = p.regioes ? p.regioes.split(', ') : ['SP'];
+            document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => {
+                cb.checked = regioesArr.includes(cb.value);
             });
-
-            document.getElementById('countFds').innerText = c1;
-            document.getElementById('countFeriados').innerText = c2;
-            document.getElementById('badgeFds').innerText = c1;
-            document.getElementById('badgeFeriados').innerText = c2;
         }
 
-        function checkAdminAccess() {
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('passwordModal').classList.remove('hidden');
-        }
+        document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600"></i> Editando Registro`;
+        document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar Alterações`;
+        document.getElementById('btnCancelEdit').classList.remove('hidden');
 
-        function closePasswordModal() { document.getElementById('passwordModal').classList.add('hidden'); }
+        const modalContent = document.querySelector('#adminModal .overflow-y-auto');
+        modalContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        function validatePassword() {
-            const pass = document.getElementById('adminPassword').value;
-            if(pass === 'R2wDz0u&') {
-                closePasswordModal();
-                document.getElementById('adminModal').classList.remove('hidden');
-            } else { alert('Senha incorreta!'); }
-        }
+    function resetForm() {
+        document.getElementById('editId').value = '';
+        document.getElementById('manualData').value = '';
+        document.getElementById('manualDiaSemana').value = '';
+        document.getElementById('manualCategoria').value = 'fds';
+        document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => cb.checked = false);
+        document.getElementById('btnCancelEdit').classList.add('hidden');
+        document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem`;
+    }
 
-        function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+    async function importExcelBulk() {
+        const rawText = document.getElementById('bulkData').value.trim();
+        const isFeriadoChecked = document.getElementById('isFeriadoCheck').checked;
 
-        // --- VERIFICAÇÃO DE CONFLITO DE ESCALA ---
-        function verificarConflito(nome, data, idAtual) {
-            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-            const campoNome = modoAtual === 'cgr' ? 'plantonista' : 'supervisor';
+        if(!rawText) { alert('Cole os dados copiados na caixa de texto!'); return; }
 
-            const conflito = dadosAtuais.find(item => 
-                item.id !== idAtual && 
-                item.data === data && 
-                item[campoNome].toUpperCase() === nome.toUpperCase()
-            );
+        const lines = rawText.split('\n').filter(l => l.trim() !== '');
+        let addedCount = 0;
+        let conflitosCount = 0;
+        const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
 
-            return conflito;
-        }
+        for (let line of lines) {
+            const matchDate = line.match(/\d{2}\/\d{2}\/\d{4}/);
+            if (matchDate) {
+                const dateStr = matchDate[0];
+                const dateIndex = line.indexOf(dateStr);
+                const remainder = line.substring(dateIndex + dateStr.length).trim();
 
-        async function salvarItemManual() {
-            const id = document.getElementById('editId').value;
-            const data = document.getElementById('manualData').value.trim();
-            const diaSemana = document.getElementById('manualDiaSemana').value;
-            const categoria = document.getElementById('manualCategoria').value;
+                let diaSemana = '';
+                if(remainder.includes('Domingo')) diaSemana = 'Domingo';
+                else if(remainder.includes('Segunda')) diaSemana = 'Segunda-feira';
+                else if(remainder.includes('Terça')) diaSemana = 'Terça-feira';
+                else if(remainder.includes('Quarta')) diaSemana = 'Quarta-feira';
+                else if(remainder.includes('Quinta')) diaSemana = 'Quinta-feira';
+                else if(remainder.includes('Sexta')) diaSemana = 'Sexta-feira';
+                else if(remainder.includes('Sábado')) diaSemana = 'Sábado';
 
-            if(!data) { alert('Preencha a Data!'); return; }
+                if (isFeriadoChecked || !diaSemana) {
+                    diaSemana = obterDiaDaSemana(dateStr);
+                }
 
-            const nomeColaborador = modoAtual === 'cgr' ? document.getElementById('manualPlantonista').value : document.getElementById('manualSupervisor').value;
+                let categoria = isFeriadoChecked ? 'feriados' : 'fds';
+                let itemId = (modoAtual === 'cgr' ? 'p_' : 'sup_') + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                let novoObjeto = { categoria, data: dateStr, diaSemana };
 
-            const conflitoEncontrado = verificarConflito(nomeColaborador, data, id);
-            if (conflitoEncontrado) {
-                const continuar = confirm(`⚠️ ATENÇÃO DE CONFLITO:\n\nO colaborador "${nomeColaborador}" já possui um registro escalado no dia ${data}!\n\nDeseja salvar mesmo assim?`);
-                if (!continuar) return;
+                if (modoAtual === 'cgr') {
+                    let cleanAfterDay = remainder.replace(diaSemana, '').trim();
+                    
+                    const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
+                    let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
+                    let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
+                    
+                    let plantonista = cleanAfterTime
+                        .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
+                        .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
+                        .trim();
+
+                    if (plantonista.includes('Monitoramento')) {
+                        plantonista = plantonista.split('Monitoramento')[0].trim();
+                    }
+
+                    if (plantonista.length > 2) {
+                        novoObjeto.plantonista = plantonista.toUpperCase();
+                        novoObjeto.horario = horario;
+
+                        let linhaMaiuscula = line.toUpperCase();
+                        if (linhaMaiuscula.includes('GPON')) {
+                            novoObjeto.tratativa = 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo';
+                        } else if (linhaMaiuscula.includes('NOTURNO') || horario.startsWith('22:00')) {
+                            novoObjeto.tratativa = 'Monitoramento Noturno';
+                        } else {
+                            novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
+                        }
+
+                        if (verificarConflito(novoObjeto.plantonista, dateStr, null)) {
+                            conflitosCount++;
+                        }
+
+                        await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
+                        addedCount++;
+                    }
+                } else {
+                    let sigla = remainder.includes('ES') ? 'ES' : 'SA';
+                    
+                    let supervisorNome = remainder
+                        .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
+                        .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
+                        .replace('SP', '').replace('PR', '').replace('MG', '')
+                        .replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
+
+                    if (supervisorNome.length > 2) {
+                        novoObjeto.supervisor = supervisorNome.toUpperCase();
+                        novoObjeto.sigla = sigla;
+                        novoObjeto.regioes = 'SP';
+
+                        if (verificarConflito(novoObjeto.supervisor, dateStr, null)) {
+                            conflitosCount++;
+                        }
+
+                        await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
+                        addedCount++;
+                    }
+                }
             }
+        }
 
-            const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
-            const itemId = id ? id : (modoAtual === 'cgr' ? 'p_' : 'sup_') + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-
-            let novoObjeto = { categoria, data, diaSemana };
-
-            if (modoAtual === 'cgr') {
-                novoObjeto.plantonista = nomeColaborador;
-                novoObjeto.horario = document.getElementById('manualHorario').value;
-                novoObjeto.tratativa = document.getElementById('manualTratativa').value;
-            } else {
-                novoObjeto.supervisor = nomeColaborador;
-                novoObjeto.sigla = document.getElementById('manualSigla').value;
-                
-                const checkboxes = document.querySelectorAll('input[name="regiaoSup"]:checked');
-                let regioesSelecionadas = Array.from(checkboxes).map(cb => cb.value);
-                novoObjeto.regioes = regioesSelecionadas.length > 0 ? regioesSelecionadas.join(', ') : 'SP';
+        if(addedCount > 0) {
+            let msg = `${addedCount} registros salvos na nuvem com sucesso!`;
+            if(conflitosCount > 0) {
+                msg += `\n⚠️ Atenção: Detectamos ${conflitosCount} possíveis conflitos (colaboradores escalados mais de uma vez na mesma data).`;
             }
+            alert(msg);
+            document.getElementById('bulkData').value = '';
+            document.getElementById('isFeriadoCheck').checked = false;
+            if(modoAtual === 'cgr') carregarPlantoesFirebase();
+            else carregarSupervisoresFirebase();
+        } else { alert('Não foi possível processar os dados.'); }
+    }
 
+    async function deleteItem(id) {
+        if(confirm('Tem certeza que deseja remover este registro?')) {
             try {
-                await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
-                alert(id ? 'Registro atualizado com sucesso!' : 'Cadastrado com sucesso na nuvem!');
-                resetForm();
+                const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
+                await window.deleteDoc(window.doc(window.db, colecao, id));
                 if(modoAtual === 'cgr') carregarPlantoesFirebase();
                 else carregarSupervisoresFirebase();
-            } catch (error) { alert('Erro ao salvar.'); }
+            } catch (error) { alert('Erro ao excluir.'); }
         }
+    }
 
-        function prepararEdicao(id) {
-            const colecaoDados = modoAtual === 'cgr' ? plantoes : supervisores;
-            const p = colecaoDados.find(item => item.id === id);
-            if(!p) return;
+    async function deleteAllItems() {
+        const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
+        if(dadosAtuais.length === 0) { alert('Não há registros cadastrados para remover.'); return; }
 
-            document.getElementById('editId').value = p.id;
-            document.getElementById('manualData').value = p.data;
-            document.getElementById('manualCategoria').value = p.categoria;
-            document.getElementById('manualDiaSemana').value = p.diaSemana;
-
-            if (modoAtual === 'cgr') {
-                document.getElementById('manualPlantonista').value = p.plantonista;
-                document.getElementById('manualHorario').value = p.horario;
-                document.getElementById('manualTratativa').value = p.tratativa;
-            } else {
-                document.getElementById('manualSupervisor').value = p.supervisor;
-                document.getElementById('manualSigla').value = p.sigla;
-                
-                const regioesArr = p.regioes ? p.regioes.split(', ') : ['SP'];
-                document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => {
-                    cb.checked = regioesArr.includes(cb.value);
-                });
-            }
-
-            document.getElementById('formTitle').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600"></i> Editando Registro`;
-            document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar Alterações`;
-            document.getElementById('btnCancelEdit').classList.remove('hidden');
-
-            const modalContent = document.querySelector('#adminModal .overflow-y-auto');
-            modalContent.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function resetForm() {
-            document.getElementById('editId').value = '';
-            document.getElementById('manualData').value = '';
-            document.getElementById('manualDiaSemana').value = '';
-            document.getElementById('manualCategoria').value = 'fds';
-            document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => cb.checked = false);
-            document.getElementById('btnCancelEdit').classList.add('hidden');
-            document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem`;
-        }
-
-        async function importExcelBulk() {
-            const rawText = document.getElementById('bulkData').value.trim();
-            const isFeriadoChecked = document.getElementById('isFeriadoCheck').checked;
-
-            if(!rawText) { alert('Cole os dados copiados na caixa de texto!'); return; }
-
-            const lines = rawText.split('\n').filter(l => l.trim() !== '');
-            let addedCount = 0;
-            let conflitosCount = 0;
-            const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
-
-            for (let line of lines) {
-                const matchDate = line.match(/\d{2}\/\d{2}\/\d{4}/);
-                if (matchDate) {
-                    const dateStr = matchDate[0];
-                    const dateIndex = line.indexOf(dateStr);
-                    const remainder = line.substring(dateIndex + dateStr.length).trim();
-
-                    let diaSemana = '';
-                    if(remainder.includes('Domingo')) diaSemana = 'Domingo';
-                    else if(remainder.includes('Segunda')) diaSemana = 'Segunda-feira';
-                    else if(remainder.includes('Terça')) diaSemana = 'Terça-feira';
-                    else if(remainder.includes('Quarta')) diaSemana = 'Quarta-feira';
-                    else if(remainder.includes('Quinta')) diaSemana = 'Quinta-feira';
-                    else if(remainder.includes('Sexta')) diaSemana = 'Sexta-feira';
-                    else if(remainder.includes('Sábado')) diaSemana = 'Sábado';
-
-                    if (isFeriadoChecked || !diaSemana) {
-                        diaSemana = obterDiaDaSemana(dateStr);
-                    }
-
-                    let categoria = isFeriadoChecked ? 'feriados' : 'fds';
-                    let itemId = (modoAtual === 'cgr' ? 'p_' : 'sup_') + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-                    let novoObjeto = { categoria, data: dateStr, diaSemana };
-
-                    if (modoAtual === 'cgr') {
-                        let cleanAfterDay = remainder.replace(diaSemana, '').trim();
-                        
-                        const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
-                        let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
-                        let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
-                        
-                        let plantonista = cleanAfterTime
-                            .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
-                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
-                            .trim();
-
-                        if (plantonista.includes('Monitoramento')) {
-                            plantonista = plantonista.split('Monitoramento')[0].trim();
-                        }
-
-                        if (plantonista.length > 2) {
-                            novoObjeto.plantonista = plantonista.toUpperCase();
-                            novoObjeto.horario = horario;
-
-                            let linhaMaiuscula = line.toUpperCase();
-                            if (linhaMaiuscula.includes('GPON')) {
-                                novoObjeto.tratativa = 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo';
-                            } else if (linhaMaiuscula.includes('NOTURNO') || horario.startsWith('22:00')) {
-                                novoObjeto.tratativa = 'Monitoramento Noturno';
-                            } else {
-                                novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
-                            }
-
-                            if (verificarConflito(novoObjeto.plantonista, dateStr, null)) {
-                                conflitosCount++;
-                            }
-
-                            await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
-                            addedCount++;
-                        }
-                    } else {
-                        let sigla = remainder.includes('ES') ? 'ES' : 'SA';
-                        
-                        let supervisorNome = remainder
-                            .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
-                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
-                            .replace('SP', '').replace('PR', '').replace('MG', '')
-                            .replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
-
-                        if (supervisorNome.length > 2) {
-                            novoObjeto.supervisor = supervisorNome.toUpperCase();
-                            novoObjeto.sigla = sigla;
-                            novoObjeto.regioes = 'SP';
-
-                            if (verificarConflito(novoObjeto.supervisor, dateStr, null)) {
-                                conflitosCount++;
-                            }
-
-                            await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
-                            addedCount++;
-                        }
-                    }
+        if(confirm('ATENÇÃO: Deseja excluir TODOS os registros da aba atual?')) {
+            try {
+                const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
+                for (let item of dadosAtuais) {
+                    await window.deleteDoc(window.doc(window.db, colecao, item.id));
                 }
-            }
-
-            if(addedCount > 0) {
-                let msg = `${addedCount} registros salvos na nuvem com sucesso!`;
-                if(conflitosCount > 0) {
-                    msg += `\n⚠️ Atenção: Detectamos ${conflitosCount} possíveis conflitos (colaboradores escalados mais de uma vez na mesma data).`;
-                }
-                alert(msg);
-                document.getElementById('bulkData').value = '';
-                document.getElementById('isFeriadoCheck').checked = false;
+                alert('Registros removidos com sucesso!');
                 if(modoAtual === 'cgr') carregarPlantoesFirebase();
                 else carregarSupervisoresFirebase();
-            } else { alert('Não foi possível processar os dados.'); }
+            } catch (error) { alert('Erro ao limpar.'); }
         }
+    }
 
-        async function deleteItem(id) {
-            if(confirm('Tem certeza que deseja remover este registro?')) {
-                try {
-                    const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
-                    await window.deleteDoc(window.doc(window.db, colecao, id));
-                    if(modoAtual === 'cgr') carregarPlantoesFirebase();
-                    else carregarSupervisoresFirebase();
-                } catch (error) { alert('Erro ao excluir.'); }
-            }
-        }
-
-        async function deleteAllItems() {
-            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-            if(dadosAtuais.length === 0) { alert('Não há registros cadastrados para remover.'); return; }
-
-            if(confirm('ATENÇÃO: Deseja excluir TODOS os registros da aba atual?')) {
-                try {
-                    const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
-                    for (let item of dadosAtuais) {
-                        await window.deleteDoc(window.doc(window.db, colecao, item.id));
-                    }
-                    alert('Registros removidos com sucesso!');
-                    if(modoAtual === 'cgr') carregarPlantoesFirebase();
-                    else carregarSupervisoresFirebase();
-                } catch (error) { alert('Erro ao limpar.'); }
-            }
-        }
-
-        document.getElementById('searchInput').addEventListener('input', render);
-        document.getElementById('filterDate').addEventListener('input', render);
-    </script>
-</body>
-</html>
+    document.getElementById('searchInput').addEventListener('input', render);
+</script>
