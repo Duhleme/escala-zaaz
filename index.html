@@ -61,13 +61,14 @@
                     </div>
                 </div>
 
-                <!-- Botões de Alternância e Ações -->
+                <!-- Botões de Ações e Alternância de Painel -->
                 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
                     <!-- Botão Dark Mode -->
                     <button onclick="toggleDarkMode()" class="bg-blue-800/60 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 text-white p-2.5 rounded-xl text-sm shadow transition" title="Alternar Modo Escuro">
                         <i id="themeIcon" class="fa-solid fa-moon"></i>
                     </button>
 
+                    <!-- Abas CGR / Supervisores no Header -->
                     <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-xl flex gap-1 border border-blue-800 dark:border-gray-800">
                         <button id="btnTabCgr" onclick="mudarPainel('cgr')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5">
                             <i class="fa-solid fa-headset"></i> CGR
@@ -78,11 +79,11 @@
                     </div>
 
                     <!-- Campo Unificado de Busca e Filtro -->
-                    <div class="relative w-full sm:w-64">
+                    <div class="relative w-full sm:w-52">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
                             <i class="fa-solid fa-search"></i>
                         </span>
-                        <input type="text" id="searchInput" placeholder="Buscar nome, data ou dia..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" id="searchInput" placeholder="Buscar nome ou data..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     </div>
 
                     <button onclick="checkAdminAccess()" class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition flex items-center gap-2 whitespace-nowrap">
@@ -111,28 +112,44 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
-                    <div id="headerList1" class="p-4 border-b border-gray-100 dark:border-gray-700 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-t-xl flex justify-between items-center">
-                        <h2 id="titleList1" class="font-semibold text-indigo-900 dark:text-indigo-300 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana
+            <!-- CALENDÁRIO OPERACIONAL PRINCIPAL -->
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b dark:border-gray-700 pb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="font-bold text-lg text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-days text-blue-600"></i> Calendário Operacional
                         </h2>
-                        <span id="badgeFds" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
+                        <select id="selectMesAno" onchange="render()" class="bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg px-3 py-1.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="11/2026">Novembro / 2026</option>
+                            <option value="12/2026">Dezembro / 2026</option>
+                            <option value="01/2027">Janeiro / 2027</option>
+                            <option value="02/2027">Fevereiro / 2027</option>
+                        </select>
                     </div>
-                    <div id="listFds" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/40 px-3 py-1.5 rounded-lg font-medium">💡 Feriados oficiais destacados em vermelho. Clique em qualquer dia para ver os detalhes.</span>
                 </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-[650px]">
-                    <div id="headerList2" class="p-4 border-b border-gray-100 dark:border-gray-700 bg-amber-50/50 dark:bg-amber-950/40 rounded-t-xl flex justify-between items-center">
-                        <h2 id="titleList2" class="font-semibold text-amber-900 dark:text-amber-300 flex items-center gap-2">
-                            <i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados
-                        </h2>
-                        <span id="badgeFeriados" class="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 text-xs font-bold px-2.5 py-0.5 rounded-full">0</span>
-                    </div>
-                    <div id="listFeriados" class="p-4 overflow-y-auto space-y-3 flex-grow"></div>
+                <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
                 </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal Pop-up Detalhes do Dia (Calendário) -->
+    <div id="modalDetalhesDia" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 border dark:border-gray-700">
+            <div class="flex justify-between items-center border-b dark:border-gray-700 pb-3">
+                <h3 id="modalDetalhesTitulo" class="font-bold text-sm text-blue-900 dark:text-blue-300 flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day text-blue-600"></i> Detalhes da Escala
+                </h3>
+                <button onclick="fecharModalDetalhesDia()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="modalDetalhesConteudo" class="space-y-3 max-h-72 overflow-y-auto"></div>
+            <div class="flex justify-end pt-2 border-t dark:border-gray-700">
+                <button onclick="fecharModalDetalhesDia()" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500">Fechar</button>
+            </div>
+        </div>
     </div>
 
     <!-- Footer com Assinatura -->
@@ -220,12 +237,11 @@
                         <div>
                             <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Categoria</label>
                             <select id="manualCategoria" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="fds">Fim de Semana</option>
-                                <option value="feriados">Feriado</option>
+                                <option value="fds">Fim de Semana / Plantão Normal</option>
+                                <option value="feriados">Feriado Oficial</option>
                             </select>
                         </div>
                     </div>
-                    <!-- Campo oculto para armazenar o dia da semana calculado automaticamente -->
                     <input type="hidden" id="manualDiaSemana" value="">
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="containerCamposCgr">
@@ -295,20 +311,83 @@
                     </div>
                 </div>
 
-                <!-- Seção de Importação em Massa -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+                <!-- SEÇÃO CONDICIONAL: Importação CGR / Cadastro de Escala com Regiões Diferenciadas (Seg-Sex vs Fim de Semana) -->
+                <div id="containerBulkCgr" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
                     <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa (Excel / Google Sheets)
+                        <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa CGR
                     </h4>
-                    <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas copiadas direto da planilha..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Cole abaixo os dados copiados da planilha:</p>
+                    <textarea id="bulkData" rows="4" placeholder="Cole aqui a matriz copiada da planilha..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
                         <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                             <input type="checkbox" id="isFeriadoCheck" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                            <span class="text-xs font-semibold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado</span>
+                            <span class="text-xs font-semibold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-star text-amber-500"></i> Marcar este lote como Feriado Oficial</span>
                         </label>
 
                         <button onclick="importExcelBulk()" class="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white text-xs font-semibold rounded-lg hover:bg-gray-700 shadow">Processar Lote e Salvar</button>
+                    </div>
+                </div>
+
+                <!-- Cadastro Personalizado de Escala de Supervisores (Com Regiões Diferenciadas para Seg-Sex e Fim de Semana) -->
+                <div id="containerWeeklySupervisor" class="hidden bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
+                    <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-week text-sky-500"></i> Cadastro de Escala de Supervisores (Período Personalizado)
+                    </h4>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Escolha o período livre e defina se a região muda nos fins de semana (Sábado/Domingo):</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Supervisor</label>
+                            <select id="weeklySupervisorSelect" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="" disabled selected>Selecione...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Escala / Turno</label>
+                            <select id="weeklyScaleType" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="SA">SA - Sobreaviso</option>
+                                <option value="ES">ES - Escala / Plantão</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Data Início</label>
+                            <input type="date" id="weeklyStartDate" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Data Fim (Livre)</label>
+                            <input type="date" id="weeklyEndDate" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Bloco de Regiões de Segunda a Sexta -->
+                    <div class="bg-white dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 space-y-2">
+                        <label class="block text-xs font-bold text-blue-600 dark:text-blue-400">🏢 Regiões de Segunda a Sexta:</label>
+                        <div class="flex items-center gap-4 text-xs">
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSegSex" value="SP" class="w-4 h-4 text-blue-600 rounded"> SP</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSegSex" value="PR" class="w-4 h-4 text-blue-600 rounded"> PR</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoSegSex" value="MG" class="w-4 h-4 text-blue-600 rounded"> MG</label>
+                        </div>
+                    </div>
+
+                    <!-- Bloco de Regiões de Sábado e Domingo (Opcional se for diferente) -->
+                    <div class="bg-white dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 space-y-2">
+                        <label class="block text-xs font-bold text-amber-600 dark:text-amber-400">🌴 Regiões de Sábado e Domingo (Fins de Semana):</label>
+                        <p class="text-[10px] text-gray-400">Deixe igual acima se for cobrir a mesma região, ou marque caso assuma outra(s) região(ões) no fim de semana.</p>
+                        <div class="flex items-center gap-4 text-xs">
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoFds" value="SP" class="w-4 h-4 text-amber-600 rounded"> SP</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoFds" value="PR" class="w-4 h-4 text-amber-600 rounded"> PR</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium"><input type="checkbox" name="regiaoFds" value="MG" class="w-4 h-4 text-amber-600 rounded"> MG</label>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-1">
+                        <button onclick="salvarEscalaSemanalSupervisores()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-calendar-check"></i> Salvar Período Personalizado
+                        </button>
                     </div>
                 </div>
 
@@ -343,14 +422,13 @@
     </div>
 
     <script>
-        let modoAtual = 'cgr'; // 'cgr' ou 'sup'
+        let modoAtual = 'cgr';
         let tipoEquipeAtual = 'cgr';
         let plantoes = [];
         let supervisores = [];
         let equipeCgr = [];
         let equipeSup = [];
 
-        // Controle de Tema (Dark Mode)
         function toggleDarkMode() {
             const html = document.documentElement;
             const icon = document.getElementById('themeIcon');
@@ -365,7 +443,6 @@
             }
         }
 
-        // Carrega o tema salvo ao iniciar
         if (localStorage.getItem('zaaz_theme') === 'dark' || (!localStorage.getItem('zaaz_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
             document.addEventListener('DOMContentLoaded', () => {
@@ -374,7 +451,164 @@
             });
         }
 
-        // Máscara automática para a Data e cálculo instantâneo do Dia da Semana
+        const FERIADOS_NACIONAIS = [
+            "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
+        ];
+
+        // Renderização do Calendário e Tabela Admin
+        function render() {
+            const grid = document.getElementById('calendarGrid');
+            const selectMesAno = document.getElementById('selectMesAno');
+            const adminTableBody = document.getElementById('adminTableBody');
+            const thNome = document.getElementById('thColNome');
+            const thDetalhe = document.getElementById('thColDetalhe');
+
+            if (thNome) thNome.innerText = modoAtual === 'cgr' ? "Plantonista" : "Supervisor";
+            if (thDetalhe) thDetalhe.innerText = modoAtual === 'cgr' ? "Horário" : "Status / Turno";
+
+            if(adminTableBody) {
+                adminTableBody.innerHTML = '';
+                const dadosTabela = modoAtual === 'cgr' ? plantoes : supervisores;
+                
+                dadosTabela.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50";
+                    const colNomeVal = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
+                    const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
+
+                    tr.innerHTML = `
+                        <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${p.data} (${p.diaSemana})</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'}">${p.categoria.toUpperCase()}</span></td>
+                        <td class="p-3 text-gray-700 dark:text-gray-300">${colNomeVal}</td>
+                        <td class="p-3 text-gray-500 dark:text-gray-400">${colDetalheVal}</td>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteItem('${p.id}')" class="text-red-600 dark:text-red-400 hover:text-red-800 font-medium" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    adminTableBody.appendChild(tr);
+                });
+            }
+
+            if(!grid || !selectMesAno) return;
+            grid.innerHTML = '';
+
+            const [mesSelecionado, anoSelecionado] = selectMesAno.value.split('/');
+            const totalDiasMes = new Date(anoSelecionado, mesSelecionado, 0).getDate();
+
+            const hojeObj = new Date();
+            const diaHojeStr = String(hojeObj.getDate()).padStart(2, '0');
+            const mesHojeStr = String(hojeObj.getMonth() + 1).padStart(2, '0');
+            const anoHojeStr = hojeObj.getFullYear();
+            const dataHojeFormatada = `${diaHojeStr}/${mesHojeStr}/${anoHojeStr}`;
+
+            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            let c1 = 0, c2 = 0;
+
+            for (let dia = 1; dia <= totalDiasMes; dia++) {
+                let diaStr = String(dia).padStart(2, '0');
+                let dataFormatada = `${diaStr}/${mesSelecionado}/${anoSelecionado}`;
+                let diaMesCurto = `${diaStr}/${mesSelecionado}`;
+
+                let registrosDoDia = dadosAtuais.filter(p => p.data === dataFormatada);
+
+                if(search) {
+                    registrosDoDia = registrosDoDia.filter(p => {
+                        const nome = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
+                        return nome.toLowerCase().includes(search) || p.diaSemana.toLowerCase().includes(search);
+                    });
+                }
+
+                registrosDoDia.forEach(r => {
+                    if (r.categoria === 'fds') c1++;
+                    if (r.categoria === 'feriados') c2++;
+                });
+
+                const celula = document.createElement('div');
+                let temEscala = registrosDoDia.length > 0;
+                let ehHoje = (dataFormatada === dataHojeFormatada);
+                
+                let temFeriadoCadastrado = registrosDoDia.some(r => r.categoria === 'feriados');
+                let ehFeriadoOficial = FERIADOS_NACIONAIS.includes(diaMesCurto) || temFeriadoCadastrado;
+
+                let classesBorda = '';
+                if (ehHoje) {
+                    classesBorda = 'border-2 border-amber-500 shadow-md bg-amber-50/40 dark:bg-amber-950/30';
+                } else if (ehFeriadoOficial) {
+                    classesBorda = 'border-2 border-red-500 shadow-md bg-red-50/40 dark:bg-red-950/30 text-red-600 dark:text-red-400 font-bold';
+                } else if (temEscala) {
+                    classesBorda = 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/60 shadow-sm';
+                } else {
+                    classesBorda = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60 hover:bg-gray-50';
+                }
+
+                celula.className = `h-20 p-2.5 rounded-xl border flex flex-col justify-between transition cursor-pointer select-none ${classesBorda}`;
+
+                celula.innerHTML = `
+                    <div class="flex justify-between items-center w-full">
+                        <span class="text-xs font-bold ${ehFeriadoOficial && !ehHoje ? 'text-red-600 dark:text-red-400' : (ehHoje ? 'text-amber-600 dark:text-amber-400 font-extrabold' : 'text-gray-700 dark:text-gray-200')}">
+                            ${dia} 
+                            ${ehHoje ? '<span class="text-[9px] bg-amber-500 text-white px-1.5 py-0.2 rounded-full font-bold ml-1">HOJE</span>' : ''}
+                            ${ehFeriadoOficial && !ehHoje ? '<span class="text-[9px] bg-red-600 text-white px-1.5 py-0.2 rounded-full font-bold ml-1">FERIADO</span>' : ''}
+                        </span>
+                        ${temEscala ? `<span class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold shadow-sm"><i class="fa-solid fa-user-group text-[8px] mr-1"></i> ${registrosDoDia.length}</span>` : ''}
+                    </div>
+                    <div class="text-[10px] text-gray-400 dark:text-gray-500 text-center italic">
+                        ${temEscala ? 'Ver detalhes' : ''}
+                    </div>
+                `;
+
+                if(temEscala) {
+                    celula.onclick = () => abrirModalDetalhesDia(dataFormatada, registrosDoDia);
+                }
+
+                grid.appendChild(celula);
+            }
+
+            document.getElementById('countFds').innerText = c1;
+            document.getElementById('countFeriados').innerText = c2;
+        }
+
+        function abrirModalDetalhesDia(dataStr, registros) {
+            const modal = document.getElementById('modalDetalhesDia');
+            const titulo = document.getElementById('modalDetalhesTitulo');
+            const conteudo = document.getElementById('modalDetalhesConteudo');
+
+            titulo.innerHTML = `<i class="fa-solid fa-calendar-day text-blue-600"></i> Escala do dia ${dataStr}`;
+            conteudo.innerHTML = '';
+
+            registros.forEach(r => {
+                const item = document.createElement('div');
+                item.className = "bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs space-y-1";
+
+                if (modoAtual === 'cgr') {
+                    item.innerHTML = `
+                        <div class="font-bold text-sm text-gray-800 dark:text-gray-100">${r.plantonista}</div>
+                        <div class="text-blue-600 dark:text-blue-400 font-medium"><i class="fa-regular fa-clock"></i> ${r.horario}</div>
+                        <div class="text-gray-600 dark:text-gray-300"><strong>Tratativa:</strong> ${r.tratativa}</div>
+                    `;
+                } else {
+                    const badgeSigla = r.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-sm text-gray-800 dark:text-gray-100"><i class="fa-solid fa-user-tie text-blue-600"></i> ${r.supervisor}</span>
+                            <span class="px-2 py-0.5 rounded font-bold ${badgeSigla}">${r.sigla}</span>
+                        </div>
+                        <div class="text-gray-500 dark:text-gray-400 font-medium">Região: ${r.regioes || 'SP'}</div>
+                    `;
+                }
+                conteudo.appendChild(item);
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        function fecharModalDetalhesDia() {
+            document.getElementById('modalDetalhesDia').classList.add('hidden');
+        }
+
         document.getElementById('manualData').addEventListener('input', function (e) {
             let v = e.target.value.replace(/\D/g, '');
             if (v.length > 8) v = v.slice(0, 8);
@@ -390,7 +624,6 @@
             }
         });
 
-        // Descobre o dia da semana corretamente pelo padrão brasileiro (DD/MM/AAAA)
         function obterDiaDaSemana(dataStr) {
             const partes = dataStr.split('/');
             if (partes.length !== 3) return 'Feriado';
@@ -452,6 +685,7 @@
                 }
                 equipeSup.sort((a, b) => a.nome.localeCompare(b.nome));
                 atualizarSelectSup();
+                atualizarSelectWeeklySupervisor();
             } catch (error) { console.error("Erro equipe Sup:", error); }
         }
 
@@ -475,6 +709,90 @@
                 opt.value = m.nome; opt.innerText = m.nome;
                 select.appendChild(opt);
             });
+        }
+
+        function atualizarSelectWeeklySupervisor() {
+            const select = document.getElementById('weeklySupervisorSelect');
+            if(!select) return;
+            select.innerHTML = '<option value="" disabled selected>Selecione...</option>';
+            equipeSup.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.nome; opt.innerText = m.nome;
+                select.appendChild(opt);
+            });
+        }
+
+        // Cadastro Personalizado de Escala de Supervisores com Regiões Diferenciadas (Seg-Sex vs Fim de Semana)
+        async function salvarEscalaSemanalSupervisores() {
+            const supervisor = document.getElementById('weeklySupervisorSelect').value;
+            const sigla = document.getElementById('weeklyScaleType').value;
+            const startDateStr = document.getElementById('weeklyStartDate').value;
+            const endDateStr = document.getElementById('weeklyEndDate').value;
+            
+            // Pega as regiões de Seg-Sex
+            const cbSegSex = document.querySelectorAll('input[name="regiaoSegSex"]:checked');
+            let regSegSexArr = Array.from(cbSegSex).map(cb => cb.value);
+            const regioesSegSex = regSegSexArr.length > 0 ? regSegSexArr.join(', ') : 'SP';
+
+            // Pega as regiões de Fim de Semana (Sábado/Domingo)
+            const cbFds = document.querySelectorAll('input[name="regiaoFds"]:checked');
+            let regFdsArr = Array.from(cbFds).map(cb => cb.value);
+            const regioesFds = regFdsArr.length > 0 ? regFdsArr.join(', ') : regioesSegSex;
+
+            if (!supervisor || !startDateStr || !endDateStr) {
+                alert("Por favor, preencha o supervisor e as datas de início e fim.");
+                return;
+            }
+
+            let currDate = new Date(startDateStr + 'T00:00:00');
+            let endDate = new Date(endDateStr + 'T00:00:00');
+
+            if (currDate > endDate) {
+                alert("A data de início deve ser anterior ou igual à data de fim.");
+                return;
+            }
+
+            let addedCount = 0;
+            const colecao = 'supervisores';
+
+            while (currDate <= endDate) {
+                let diaStr = String(currDate.getDate()).padStart(2, '0');
+                let mesStr = String(currDate.getMonth() + 1).padStart(2, '0');
+                let anoStr = currDate.getFullYear();
+                let dateStr = `${diaStr}/${mesStr}/${anoStr}`;
+                let diaMesCurto = `${diaStr}/${mesStr}`;
+                let diaSemanaNum = currDate.getDay(); // 0 = Domingo, 6 = Sábado
+                let diaSemana = obterDiaDaSemana(dateStr);
+
+                // Define se é fim de semana (Sábado = 6, Domingo = 0)
+                let ehFimDeSemana = (diaSemanaNum === 0 || diaSemanaNum === 6);
+                let regioesDia = ehFimDeSemana ? regioesFds : regioesSegSex;
+
+                let ehFeriadoOficial = FERIADOS_NACIONAIS.includes(diaMesCurto);
+                let categoria = ehFeriadoOficial ? 'feriados' : 'fds';
+
+                let itemId = 'sup_w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                let novoObjeto = {
+                    categoria,
+                    data: dateStr,
+                    diaSemana,
+                    supervisor,
+                    sigla,
+                    regioes: regioesDia
+                };
+
+                await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
+                addedCount++;
+
+                currDate.setDate(currDate.getDate() + 1);
+            }
+
+            alert(`Sucesso! Escala cadastrada para ${supervisor} (${addedCount} dias gerados com regiões dinâmicas).`);
+            document.getElementById('weeklyStartDate').value = '';
+            document.getElementById('weeklyEndDate').value = '';
+            document.querySelectorAll('input[name="regiaoSegSex"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('input[name="regiaoFds"]').forEach(cb => cb.checked = false);
+            carregarSupervisoresFirebase();
         }
 
         function abrirModalEquipeNaTela() {
@@ -517,7 +835,10 @@
             input.value = '';
             
             if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
-            else carregarEquipeSupFirebase();
+            else {
+                carregarEquipeSupFirebase();
+                atualizarSelectWeeklySupervisor();
+            }
             abrirModalEquipeNaTela();
         }
 
@@ -527,13 +848,17 @@
                 await window.deleteDoc(window.doc(window.db, colecaoDb, id));
                 
                 if(tipoEquipeAtual === 'cgr') carregarEquipeCgrFirebase();
-                else carregarEquipeSupFirebase();
+                else {
+                    carregarEquipeSupFirebase();
+                    atualizarSelectWeeklySupervisor();
+                }
                 abrirModalEquipeNaTela();
             }
         }
 
         function mudarPainel(novoModo) {
             modoAtual = novoModo;
+            
             const btnCgr = document.getElementById('btnTabCgr');
             const btnSup = document.getElementById('btnTabSup');
             const adminBtnCgr = document.getElementById('adminBtnCgr');
@@ -541,141 +866,53 @@
             const subHeader = document.getElementById('subHeaderTitle');
             const label1 = document.getElementById('labelCard1');
             const label2 = document.getElementById('labelCard2');
-            const title1 = document.getElementById('titleList1');
-            const title2 = document.getElementById('titleList2');
             const adminTitle = document.getElementById('adminModalTitle');
             const containerCgr = document.getElementById('containerCamposCgr');
             const containerSup = document.getElementById('containerCamposSup');
             const containerTratativa = document.getElementById('containerTratativa');
-            const thNome = document.getElementById('thColNome');
-            const thDetalhe = document.getElementById('thColDetalhe');
+            const containerBulkCgr = document.getElementById('containerBulkCgr');
+            const containerWeekly = document.getElementById('containerWeeklySupervisor');
+
+            const activeClass = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
+            const inactiveClass = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
+
+            const adminActiveClass = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
+            const adminInactiveClass = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
 
             if (modoAtual === 'cgr') {
-                if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
-                if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
-                if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
-                if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
+                if(btnCgr) btnCgr.className = activeClass;
+                if(btnSup) btnSup.className = inactiveClass;
+                if(adminBtnCgr) adminBtnCgr.className = adminActiveClass;
+                if(adminBtnSup) adminBtnSup.className = adminInactiveClass;
 
-                subHeader.innerText = "Escala CGR (Fins de Semana e Feriados)";
-                label1.innerText = "Fins de Semana Escalados";
-                label2.innerText = "Feriados Escalados";
-                title1.innerHTML = '<i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana';
-                title2.innerHTML = '<i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados';
-                adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR';
-                containerCgr.classList.remove('hidden');
-                containerSup.classList.add('hidden');
-                containerTratativa.classList.remove('hidden');
-                thNome.innerText = "Plantonista";
-                thDetalhe.innerText = "Horário";
+                if(subHeader) subHeader.innerText = "Escala CGR (Fins de Semana e Feriados)";
+                if(label1) label1.innerText = "Fins de Semana Escalados";
+                if(label2) label2.innerText = "Feriados Escalados";
+                if(adminTitle) adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR';
+                
+                if(containerCgr) containerCgr.classList.remove('hidden');
+                if(containerSup) containerSup.classList.add('hidden');
+                if(containerTratativa) containerTratativa.classList.remove('hidden');
+                if(containerBulkCgr) containerBulkCgr.classList.remove('hidden');
+                if(containerWeekly) containerWeekly.classList.add('hidden');
             } else {
-                if(btnSup) btnSup.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5";
-                if(btnCgr) btnCgr.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5";
-                if(adminBtnSup) adminBtnSup.className = "px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1";
-                if(adminBtnCgr) adminBtnCgr.className = "px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1";
+                if(btnSup) btnSup.className = activeClass;
+                if(btnCgr) btnCgr.className = inactiveClass;
+                if(adminBtnSup) adminBtnSup.className = adminActiveClass;
+                if(adminBtnCgr) adminBtnCgr.className = adminInactiveClass;
 
-                subHeader.innerText = "Escala de Supervisores de Campo (Sábados, Domingos e Feriados)";
-                label1.innerText = "Fins de Semana Escalados";
-                label2.innerText = "Feriados Escalados";
-                title1.innerHTML = '<i class="fa-solid fa-calendar-week text-indigo-600 dark:text-indigo-400"></i> Fins de Semana';
-                title2.innerHTML = '<i class="fa-solid fa-flag text-amber-600 dark:text-amber-400"></i> Feriados';
-                adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Supervisores de Campo';
-                containerCgr.classList.add('hidden');
-                containerSup.classList.remove('hidden');
-                containerTratativa.classList.add('hidden');
-                thNome.innerText = "Supervisor";
-                thDetalhe.innerText = "Status / Turno";
+                if(subHeader) subHeader.innerText = "Escala de Supervisores de Campo (Sábados, Domingos e Feriados)";
+                if(label1) label1.innerText = "Fins de Semana Escalados";
+                if(label2) label2.innerText = "Feriados Escalados";
+                if(adminTitle) adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Supervisores de Campo';
+                
+                if(containerCgr) containerCgr.classList.add('hidden');
+                if(containerSup) containerSup.classList.remove('hidden');
+                if(containerTratativa) containerTratativa.classList.add('hidden');
+                if(containerBulkCgr) containerBulkCgr.classList.add('hidden');
+                if(containerWeekly) containerWeekly.classList.remove('hidden');
             }
             render();
-        }
-
-        function render() {
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const list1 = document.getElementById('listFds');
-            const list2 = document.getElementById('listFeriados');
-            const adminTableBody = document.getElementById('adminTableBody');
-
-            if(!list1 || !list2) return;
-            list1.innerHTML = '';
-            list2.innerHTML = '';
-            adminTableBody.innerHTML = '';
-
-            let c1 = 0, c2 = 0;
-            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-
-            const filtered = dadosAtuais.filter(item => {
-                const nomeOuSup = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
-                // Busca unificada: verifica nome, data ou dia da semana no mesmo campo
-                return nomeOuSup.toLowerCase().includes(search) || 
-                       item.diaSemana.toLowerCase().includes(search) ||
-                       item.data.toLowerCase().includes(search);
-            });
-
-            // Ordenar sequencialmente por data (crescente)
-            filtered.sort((a, b) => {
-                const d1 = a.data.split('/').reverse().join('');
-                const d2 = b.data.split('/').reverse().join('');
-                return d1.localeCompare(d2);
-            });
-
-            filtered.forEach(p => {
-                const card = document.createElement('div');
-                let borderColor = "border-l-4 border-l-indigo-500";
-                if(p.categoria === 'feriados') borderColor = "border-l-4 border-l-amber-500";
-
-                card.className = `bg-white dark:bg-gray-800 p-3.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition ${borderColor}`;
-                
-                if (modoAtual === 'cgr') {
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-1.5">
-                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
-                        </div>
-                        <div class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1">${p.plantonista}</div>
-                        <div class="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${p.horario}</div>
-                        <div class="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 p-2 rounded">${p.tratativa}</div>
-                    `;
-                } else {
-                    const badgeSigla = p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
-                    const regioesExibidas = p.regioes ? p.regioes : 'SP';
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-1.5">
-                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">${p.data} (${p.diaSemana})</span>
-                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeSigla}">${p.sigla} - ${p.sigla === 'SA' ? 'Sobreaviso' : 'Escala/Plantão'}</span>
-                        </div>
-                        <div class="font-semibold text-gray-800 dark:text-gray-100 text-sm mb-1"><i class="fa-solid fa-user-tie text-blue-600 dark:text-blue-400"></i> ${p.supervisor}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">Região: ${regioesExibidas}</div>
-                    `;
-                }
-
-                if(p.categoria === 'fds') {
-                    list1.appendChild(card);
-                    c1++;
-                } else if(p.categoria === 'feriados') {
-                    list2.appendChild(card);
-                    c2++;
-                }
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50";
-                const colNomeVal = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
-                const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
-
-                tr.innerHTML = `
-                    <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${p.data} (${p.diaSemana})</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'}">${p.categoria.toUpperCase()}</span></td>
-                    <td class="p-3 text-gray-700 dark:text-gray-300">${colNomeVal}</td>
-                    <td class="p-3 text-gray-500 dark:text-gray-400">${colDetalheVal}</td>
-                    <td class="p-3 text-right space-x-2">
-                        <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteItem('${p.id}')" class="text-red-600 dark:text-red-400 hover:text-red-800 font-medium" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
-                adminTableBody.appendChild(tr);
-            });
-
-            document.getElementById('countFds').innerText = c1;
-            document.getElementById('countFeriados').innerText = c2;
-            document.getElementById('badgeFds').innerText = c1;
-            document.getElementById('badgeFeriados').innerText = c2;
         }
 
         function checkAdminAccess() {
@@ -690,12 +927,12 @@
             if(pass === 'R2wDz0u&') {
                 closePasswordModal();
                 document.getElementById('adminModal').classList.remove('hidden');
+                render();
             } else { alert('Senha incorreta!'); }
         }
 
         function closeAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
 
-        // --- VERIFICAÇÃO DE CONFLITO DE ESCALA ---
         function verificarConflito(nome, data, idAtual) {
             const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
             const campoNome = modoAtual === 'cgr' ? 'plantonista' : 'supervisor';
@@ -795,112 +1032,84 @@
         }
 
         async function importExcelBulk() {
-            const rawText = document.getElementById('bulkData').value.trim();
+            const rawText = document.getElementById('bulkData').value;
             const isFeriadoChecked = document.getElementById('isFeriadoCheck').checked;
 
-            if(!rawText) { alert('Cole os dados copiados na caixa de texto!'); return; }
+            if(!rawText.trim()) { alert('Cole os dados copiados na caixa de texto!'); return; }
 
-            const lines = rawText.split('\n').filter(l => l.trim() !== '');
+            const selectMesAno = document.getElementById('selectMesAno');
+            const [mesStr, anoStr] = selectMesAno.value.split('/');
+            const colecao = 'plantoes';
+
             let addedCount = 0;
-            let conflitosCount = 0;
-            const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
+            const lines = rawText.split('\n');
+            const nomesEquipeCgr = equipeCgr.map(m => m.nome.toUpperCase());
 
             for (let line of lines) {
-                const matchDate = line.match(/\d{2}\/\d{2}\/\d{4}/);
-                if (matchDate) {
-                    const dateStr = matchDate[0];
-                    const dateIndex = line.indexOf(dateStr);
-                    const remainder = line.substring(dateIndex + dateStr.length).trim();
+                let trimmedLine = line.trim();
+                if (!trimmedLine) continue;
 
-                    let diaSemana = '';
-                    if(remainder.includes('Domingo')) diaSemana = 'Domingo';
-                    else if(remainder.includes('Segunda')) diaSemana = 'Segunda-feira';
-                    else if(remainder.includes('Terça')) diaSemana = 'Terça-feira';
-                    else if(remainder.includes('Quarta')) diaSemana = 'Quarta-feira';
-                    else if(remainder.includes('Quinta')) diaSemana = 'Quinta-feira';
-                    else if(remainder.includes('Sexta')) diaSemana = 'Sexta-feira';
-                    else if(remainder.includes('Sábado')) diaSemana = 'Sábado';
+                const matchDate = trimmedLine.match(/\d{2}\/\d{2}\/\d{4}/);
+                if (!matchDate) continue;
 
-                    if (isFeriadoChecked || !diaSemana) {
-                        diaSemana = obterDiaDaSemana(dateStr);
-                    }
+                const dateStr = matchDate[0];
+                const dateIndex = trimmedLine.indexOf(dateStr);
+                const remainder = trimmedLine.substring(dateIndex + dateStr.length).trim();
 
-                    let categoria = isFeriadoChecked ? 'feriados' : 'fds';
-                    let itemId = (modoAtual === 'cgr' ? 'p_' : 'sup_') + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-                    let novoObjeto = { categoria, data: dateStr, diaSemana };
+                if (!remainder) continue;
 
-                    if (modoAtual === 'cgr') {
-                        let cleanAfterDay = remainder.replace(diaSemana, '').trim();
-                        
-                        const matchTime = cleanAfterDay.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
-                        let horario = matchTime ? matchTime[0].trim() : '07:00-13:00 / 14:00-16:00';
-                        let cleanAfterTime = cleanAfterDay.replace(horario, '').trim();
-                        
-                        let plantonista = cleanAfterTime
-                            .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
-                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
-                            .trim();
+                let diaSemana = obterDiaDaSemana(dateStr);
+                let [dCol, mCol] = dateStr.split('/');
+                let chaveCurta = `${dCol}/${mCol}`;
 
-                        if (plantonista.includes('Monitoramento')) {
-                            plantonista = plantonista.split('Monitoramento')[0].trim();
-                        }
+                let ehFeriadoData = isFeriadoChecked || FERIADOS_NACIONAIS.includes(chaveCurta);
+                let categoria = ehFeriadoData ? 'feriados' : 'fds';
+                let itemId = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
 
-                        if (plantonista.length > 2) {
-                            novoObjeto.plantonista = plantonista.toUpperCase();
-                            novoObjeto.horario = horario;
+                let horarioEncontrado = "07:00-13:00 / 14:00-16:00";
+                const matchHorario = remainder.match(/\d{2}:\d{2}\s*-\s*\d{2}:\d{2}(\s*\/\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2})?/);
+                if (matchHorario) {
+                    horarioEncontrado = matchHorario[0].trim();
+                }
 
-                            let linhaMaiuscula = line.toUpperCase();
-                            if (linhaMaiuscula.includes('GPON')) {
-                                novoObjeto.tratativa = 'Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo';
-                            } else if (linhaMaiuscula.includes('NOTURNO') || horario.startsWith('22:00')) {
-                                novoObjeto.tratativa = 'Monitoramento Noturno';
-                            } else {
-                                novoObjeto.tratativa = 'Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo';
-                            }
+                let plantonistaEncontrado = "";
+                const remUp = remainder.toUpperCase();
 
-                            if (verificarConflito(novoObjeto.plantonista, dateStr, null)) {
-                                conflitosCount++;
-                            }
-
-                            await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
-                            addedCount++;
-                        }
-                    } else {
-                        let sigla = remainder.includes('ES') ? 'ES' : 'SA';
-                        
-                        let supervisorNome = remainder
-                            .replace(/\(?[A-ZÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙ\s]+\)/gi, '')
-                            .replace(/^(SEGUNDA[- ]FEIRA|TERÇA[- ]FEIRA|QUARTA[- ]FEIRA|QUINTA[- ]FEIRA|SEXTA[- ]FEIRA|SÁBADO|DOMINGO|FERIADO)/gi, '')
-                            .replace('SP', '').replace('PR', '').replace('MG', '')
-                            .replace('SUPERVISOR', '').replace('SA', '').replace('ES', '').trim();
-
-                        if (supervisorNome.length > 2) {
-                            novoObjeto.supervisor = supervisorNome.toUpperCase();
-                            novoObjeto.sigla = sigla;
-                            novoObjeto.regioes = 'SP';
-
-                            if (verificarConflito(novoObjeto.supervisor, dateStr, null)) {
-                                conflitosCount++;
-                            }
-
-                            await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
-                            addedCount++;
-                        }
+                for (let nomeMembro of nomesEquipeCgr) {
+                    if (remUp.includes(nomeMembro)) {
+                        plantonistaEncontrado = nomeMembro;
+                        break;
                     }
                 }
+
+                if (!plantonistaEncontrado) continue;
+
+                let tratativaEncontrada = "Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo";
+                if (remUp.includes("GPON")) {
+                    tratativaEncontrada = "Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo";
+                } else if (remUp.includes("NOTURNO")) {
+                    tratativaEncontrada = "Monitoramento Noturno";
+                }
+
+                let novoObjeto = {
+                    categoria,
+                    data: dateStr,
+                    diaSemana,
+                    plantonista: plantonistaEncontrado,
+                    horario: horarioEncontrado,
+                    tratativa: tratativaEncontrada
+                };
+
+                await window.setDoc(window.doc(window.db, colecao, itemId), novoObjeto);
+                addedCount++;
             }
 
             if(addedCount > 0) {
-                let msg = `${addedCount} registros salvos na nuvem com sucesso!`;
-                if(conflitosCount > 0) {
-                    msg += `\n⚠️ Atenção: Detectamos ${conflitosCount} possíveis conflitos (colaboradores escalados mais de uma vez na mesma data).`;
-                }
-                alert(msg);
+                alert(`${addedCount} registros CGR importados com sucesso!`);
                 document.getElementById('bulkData').value = '';
                 document.getElementById('isFeriadoCheck').checked = false;
-                if(modoAtual === 'cgr') carregarPlantoesFirebase();
-                else carregarSupervisoresFirebase();
-            } else { alert('Não foi possível processar os dados.'); }
+                carregarPlantoesFirebase();
+            } else { alert('Nenhuma linha válida encontrada para importação.'); }
         }
 
         async function deleteItem(id) {
