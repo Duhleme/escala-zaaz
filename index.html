@@ -584,77 +584,83 @@
 
         // Função para exportar os dados cadastrados em PDF (via Impressão Formatada)
         function exportarTabelaPDF() {
-            const dados = modoAtual === 'cgr' ? plantoes : supervisores;
-            const tituloPainel = modoAtual === 'cgr' ? "Escala CGR" : "Escala de Supervisores";
+    const dados = modoAtual === 'cgr' ? plantoes : supervisores;
+    const tituloPainel = modoAtual === 'cgr' ? "Escala CGR" : "Escala de Supervisores";
 
-            if (!dados || dados.length === 0) {
-                alert("Não há registros cadastrados para exportar.");
-                return;
-            }
+    if (!dados || dados.length === 0) {
+        alert("Não há registros cadastrados para exportar.");
+        return;
+    }
 
-            let janelaPrint = window.open('', '_blank');
-            let htmlConteudo = `
-                <html>
-                <head>
-                    <title>Relatório - ${tituloPanel || tituloPainel} - ZaaZ Telecom</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-                        h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                        th { background-color: #1e3a8a; color: white; }
-                        tr:nth-child(even) { background-color: #f9f9f9; }
-                        .footer { margin-top: 30px; font-size: 10px; text-align: center; color: #777; }
-                    </style>
-                </head>
-                <body>
-                    <h2>ZaaZ Telecom - Relatório Operacional (${tituloPainel})</h2>
-                    <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Tipo</th>
-                                <th>${modoAtual === 'cgr' ? 'Plantonista' : 'Supervisor'}</th>
-                                <th>${modoAtual === 'cgr' ? 'Horário / Tratativa' : 'Turno / Região'}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+    // Cria um elemento iframe oculto para evitar bloqueio de pop-up e about:blank
+    let iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
 
-            dados.forEach(item => {
-                let nome = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
-                let detalhe = modoAtual === 'cgr' ? `${item.horario} - ${item.tratativa}` : `${item.sigla} (${item.regioes || 'SP'})`;
-                htmlConteudo += `
+    let doc = iframe.contentWindow.document;
+    doc.open();
+
+    let htmlConteudo = `
+        <html>
+        <head>
+            <title>Relatório - ${tituloPainel} - ZaaZ Telecom</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background-color: #1e3a8a; color: white; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .footer { margin-top: 30px; font-size: 10px; text-align: center; color: #777; }
+            </style>
+        </head>
+        <body>
+            <h2>ZaaZ Telecom - Relatório Operacional (${tituloPainel})</h2>
+            <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+            <table>
+                <thead>
                     <tr>
-                        <td>${item.data} (${item.diaSemana})</td>
-                        <td><b>${item.categoria.toUpperCase()}</b></td>
-                        <td>${nome}</td>
-                        <td>${detalhe}</td>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>${modoAtual === 'cgr' ? 'Plantonista' : 'Supervisor'}</th>
+                        <th>${modoAtual === 'cgr' ? 'Horário / Tratativa' : 'Turno / Região'}</th>
                     </tr>
-                `;
-            });
+                </thead>
+                <tbody>
+    `;
 
-            htmlConteudo += `
-                        </tbody>
-                    </table>
-                    <div class="footer">ZaaZ Telecom &copy; 2026 - Painel Operacional</div>
-                </body>
-                </html>
-            `;
+    dados.forEach(item => {
+        let nome = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
+        let detalhe = modoAtual === 'cgr' ? `${item.horario} - ${item.tratativa}` : `${item.sigla} (${item.regioes || 'SP'})`;
+        htmlConteudo += `
+            <tr>
+                <td>${item.data} (${item.diaSemana})</td>
+                <td><b>${item.categoria.toUpperCase()}</b></td>
+                <td>${nome}</td>
+                <td>${detalhe}</td>
+            </tr>
+        `;
+    });
 
-            janelaPrint.document.write(htmlConteudo);
-            janelaPrint.document.close();
-            janelaPrint.focus();
-            setTimeout(() => {
-                janelaPrint.print();
-            }, 500);
-        }
+    htmlConteudo += `
+                </tbody>
+            </table>
+            <div class="footer">ZaaZ Telecom &copy; 2026 - Painel Operacional</div>
+        </body>
+        </html>
+    `;
 
-        function abrirModalDetalhesDia(dataStr, registros) {
-            const modal = document.getElementById('modalDetalhesDia');
-            const titulo = document.getElementById('modalDetalhesTitulo');
-            const conteudo = document.getElementById('modalDetalhesConteudo');
+    doc.write(htmlConteudo);
+    doc.close();
+
+    // Aguarda o carregamento interno e dispara a janela de impressão/PDF
+    setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        // Remove o iframe após o uso
+        setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+    }, 300);
+}
 
             titulo.innerHTML = `<i class="fa-solid fa-calendar-day text-blue-600"></i> Escala do dia ${dataStr}`;
             conteudo.innerHTML = '';
