@@ -329,7 +329,7 @@
                     </div>
                 </div>
 
-                <!-- Cadastro Personalizado de Escala de Supervisores (Com Regiões Diferenciadas para Seg-Sex e Fim de Semana) -->
+                <!-- Cadastro Personalizado de Escala de Supervisores (Com Regiões Diferenciadas e Datas Livres) -->
                 <div id="containerWeeklySupervisor" class="hidden bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
                     <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fa-solid fa-calendar-week text-sky-500"></i> Cadastro de Escala de Supervisores (Período Personalizado)
@@ -373,7 +373,7 @@
                         </div>
                     </div>
 
-                    <!-- Bloco de Regiões de Sábado e Domingo (Opcional se for diferente) -->
+                    <!-- Bloco de Regiões de Sábado e Domingo (Opcional) -->
                     <div class="bg-white dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 space-y-2">
                         <label class="block text-xs font-bold text-amber-600 dark:text-amber-400">🌴 Regiões de Sábado e Domingo (Fins de Semana):</label>
                         <p class="text-[10px] text-gray-400">Deixe igual acima se for cobrir a mesma região, ou marque caso assuma outra(s) região(ões) no fim de semana.</p>
@@ -391,13 +391,18 @@
                     </div>
                 </div>
 
-                <!-- Tabela de Gestão -->
+                <!-- Tabela de Gestão com Botão de Exportar PDF -->
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300" id="adminTableTitle">Registros Cadastrados na Nuvem</h4>
-                        <button onclick="deleteAllItems()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-trash-can"></i> Limpar Todos
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="exportarTabelaPDF()" class="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+                            </button>
+                            <button onclick="deleteAllItems()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-trash-can"></i> Limpar Todos
+                            </button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-xl max-h-64">
                         <table class="w-full text-left border-collapse text-xs">
@@ -455,16 +460,18 @@
             "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
         ];
 
-        // Renderização do Calendário e Tabela Admin
+        // Renderização do Calendário e Tabela Admin com Nomes Dinâmicos nos Cards
         function render() {
             const grid = document.getElementById('calendarGrid');
             const selectMesAno = document.getElementById('selectMesAno');
             const adminTableBody = document.getElementById('adminTableBody');
             const thNome = document.getElementById('thColNome');
             const thDetalhe = document.getElementById('thColDetalhe');
+            const labelCard1 = document.getElementById('labelCard1');
 
             if (thNome) thNome.innerText = modoAtual === 'cgr' ? "Plantonista" : "Supervisor";
             if (thDetalhe) thDetalhe.innerText = modoAtual === 'cgr' ? "Horário" : "Status / Turno";
+            if (labelCard1) labelCard1.innerText = modoAtual === 'cgr' ? "Fins de Semana Escalados" : "Dias Escalados no Mês";
 
             if(adminTableBody) {
                 adminTableBody.innerHTML = '';
@@ -522,7 +529,11 @@
                 }
 
                 registrosDoDia.forEach(r => {
-                    if (r.categoria === 'fds') c1++;
+                    if (modoAtual === 'cgr') {
+                        if (r.categoria === 'fds') c1++;
+                    } else {
+                        c1++; // Conta todos os dias escalados do mês para supervisores
+                    }
                     if (r.categoria === 'feriados') c2++;
                 });
 
@@ -569,6 +580,75 @@
 
             document.getElementById('countFds').innerText = c1;
             document.getElementById('countFeriados').innerText = c2;
+        }
+
+        // Função para exportar os dados cadastrados em PDF (via Impressão Formatada)
+        function exportarTabelaPDF() {
+            const dados = modoAtual === 'cgr' ? plantoes : supervisores;
+            const tituloPainel = modoAtual === 'cgr' ? "Escala CGR" : "Escala de Supervisores";
+
+            if (!dados || dados.length === 0) {
+                alert("Não há registros cadastrados para exportar.");
+                return;
+            }
+
+            let janelaPrint = window.open('', '_blank');
+            let htmlConteudo = `
+                <html>
+                <head>
+                    <title>Relatório - ${tituloPanel || tituloPainel} - ZaaZ Telecom</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                        h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                        th { background-color: #1e3a8a; color: white; }
+                        tr:nth-child(even) { background-color: #f9f9f9; }
+                        .footer { margin-top: 30px; font-size: 10px; text-align: center; color: #777; }
+                    </style>
+                </head>
+                <body>
+                    <h2>ZaaZ Telecom - Relatório Operacional (${tituloPainel})</h2>
+                    <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>${modoAtual === 'cgr' ? 'Plantonista' : 'Supervisor'}</th>
+                                <th>${modoAtual === 'cgr' ? 'Horário / Tratativa' : 'Turno / Região'}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            dados.forEach(item => {
+                let nome = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
+                let detalhe = modoAtual === 'cgr' ? `${item.horario} - ${item.tratativa}` : `${item.sigla} (${item.regioes || 'SP'})`;
+                htmlConteudo += `
+                    <tr>
+                        <td>${item.data} (${item.diaSemana})</td>
+                        <td><b>${item.categoria.toUpperCase()}</b></td>
+                        <td>${nome}</td>
+                        <td>${detalhe}</td>
+                    </tr>
+                `;
+            });
+
+            htmlConteudo += `
+                        </tbody>
+                    </table>
+                    <div class="footer">ZaaZ Telecom &copy; 2026 - Painel Operacional</div>
+                </body>
+                </html>
+            `;
+
+            janelaPrint.document.write(htmlConteudo);
+            janelaPrint.document.close();
+            janelaPrint.focus();
+            setTimeout(() => {
+                janelaPrint.print();
+            }, 500);
         }
 
         function abrirModalDetalhesDia(dataStr, registros) {
@@ -722,19 +802,17 @@
             });
         }
 
-        // Cadastro Personalizado de Escala de Supervisores com Regiões Diferenciadas (Seg-Sex vs Fim de Semana)
+        // Cadastro Personalizado de Escala com Regiões Dinâmicas (Seg-Sex vs Fim de Semana)
         async function salvarEscalaSemanalSupervisores() {
             const supervisor = document.getElementById('weeklySupervisorSelect').value;
             const sigla = document.getElementById('weeklyScaleType').value;
             const startDateStr = document.getElementById('weeklyStartDate').value;
             const endDateStr = document.getElementById('weeklyEndDate').value;
             
-            // Pega as regiões de Seg-Sex
             const cbSegSex = document.querySelectorAll('input[name="regiaoSegSex"]:checked');
             let regSegSexArr = Array.from(cbSegSex).map(cb => cb.value);
             const regioesSegSex = regSegSexArr.length > 0 ? regSegSexArr.join(', ') : 'SP';
 
-            // Pega as regiões de Fim de Semana (Sábado/Domingo)
             const cbFds = document.querySelectorAll('input[name="regiaoFds"]:checked');
             let regFdsArr = Array.from(cbFds).map(cb => cb.value);
             const regioesFds = regFdsArr.length > 0 ? regFdsArr.join(', ') : regioesSegSex;
@@ -761,10 +839,9 @@
                 let anoStr = currDate.getFullYear();
                 let dateStr = `${diaStr}/${mesStr}/${anoStr}`;
                 let diaMesCurto = `${diaStr}/${mesStr}`;
-                let diaSemanaNum = currDate.getDay(); // 0 = Domingo, 6 = Sábado
+                let diaSemanaNum = currDate.getDay();
                 let diaSemana = obterDiaDaSemana(dateStr);
 
-                // Define se é fim de semana (Sábado = 6, Domingo = 0)
                 let ehFimDeSemana = (diaSemanaNum === 0 || diaSemanaNum === 6);
                 let regioesDia = ehFimDeSemana ? regioesFds : regioesSegSex;
 
@@ -902,7 +979,7 @@
                 if(adminBtnCgr) adminBtnCgr.className = adminInactiveClass;
 
                 if(subHeader) subHeader.innerText = "Escala de Supervisores de Campo (Sábados, Domingos e Feriados)";
-                if(label1) label1.innerText = "Fins de Semana Escalados";
+                if(label1) label1.innerText = "Dias Escalados no Mês";
                 if(label2) label2.innerText = "Feriados Escalados";
                 if(adminTitle) adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Supervisores de Campo';
                 
