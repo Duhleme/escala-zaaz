@@ -311,7 +311,7 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO CONDICIONAL: Importação CGR / Cadastro de Escala com Regiões Diferenciadas (Seg-Sex vs Fim de Semana) -->
+                <!-- SEÇÃO CONDICIONAL: Importação CGR / Cadastro de Escala -->
                 <div id="containerBulkCgr" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
                     <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa CGR
@@ -329,7 +329,7 @@
                     </div>
                 </div>
 
-                <!-- Cadastro Personalizado de Escala de Supervisores (Com Regiões Diferenciadas e Datas Livres) -->
+                <!-- Cadastro Personalizado de Escala de Supervisores -->
                 <div id="containerWeeklySupervisor" class="hidden bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
                     <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fa-solid fa-calendar-week text-sky-500"></i> Cadastro de Escala de Supervisores (Período Personalizado)
@@ -460,7 +460,7 @@
             "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
         ];
 
-        // Renderização do Calendário e Tabela Admin com Ordenação Cronológica e Nomes Dinâmicos
+        // Renderização do Calendário e Tabela Admin com Ordenação Cronológica Perfeita
         function render() {
             const grid = document.getElementById('calendarGrid');
             const selectMesAno = document.getElementById('selectMesAno');
@@ -477,7 +477,7 @@
                 adminTableBody.innerHTML = '';
                 const dadosTabela = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
                 
-                // Ordenação cronológica perfeita por data
+                // ORDENAÇÃO CRONOLÓGICA PERFEITA (Do dia 1 para frente no formato DD/MM/AAAA)
                 dadosTabela.sort((a, b) => {
                     const d1 = a.data.split('/').reverse().join('');
                     const d2 = b.data.split('/').reverse().join('');
@@ -589,15 +589,22 @@
             document.getElementById('countFeriados').innerText = c2;
         }
 
-        // Função de Exportação em PDF Segura via Iframe Oculto
+        // Função de Exportação em PDF com Tabela Ordenada Cronologicamente
         function exportarTabelaPDF() {
-            const dados = modoAtual === 'cgr' ? plantoes : supervisores;
+            const dados = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
             const tituloPainel = modoAtual === 'cgr' ? "Escala CGR" : "Escala de Supervisores";
 
             if (!dados || dados.length === 0) {
                 alert("Não há registros cadastrados para exportar.");
                 return;
             }
+
+            // Ordena os registros por data para o PDF sair em ordem cronológica perfeita
+            dados.sort((a, b) => {
+                const d1 = a.data.split('/').reverse().join('');
+                const d2 = b.data.split('/').reverse().join('');
+                return d1.localeCompare(d2);
+            });
 
             let iframe = document.createElement('iframe');
             iframe.style.display = 'none';
@@ -817,7 +824,7 @@
             });
         }
 
-        // Cadastro Personalizado de Escala com Regiões Dinâmicas (Seg-Sex vs Fim de Semana)
+        // Cadastro Personalizado com Regiões Dinâmicas (Seg-Sex vs Fim de Semana)
         async function salvarEscalaSemanalSupervisores() {
             const supervisor = document.getElementById('weeklySupervisorSelect').value;
             const sigla = document.getElementById('weeklyScaleType').value;
