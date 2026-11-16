@@ -460,7 +460,7 @@
             "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
         ];
 
-        // Renderização do Calendário e Tabela Admin
+        // Renderização do Calendário e Tabela Admin com Ordenação Cronológica e Nomes Dinâmicos
         function render() {
             const grid = document.getElementById('calendarGrid');
             const selectMesAno = document.getElementById('selectMesAno');
@@ -475,8 +475,15 @@
 
             if(adminTableBody) {
                 adminTableBody.innerHTML = '';
-                const dadosTabela = modoAtual === 'cgr' ? plantoes : supervisores;
+                const dadosTabela = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
                 
+                // Ordenação cronológica perfeita por data
+                dadosTabela.sort((a, b) => {
+                    const d1 = a.data.split('/').reverse().join('');
+                    const d2 = b.data.split('/').reverse().join('');
+                    return d1.localeCompare(d2);
+                });
+
                 dadosTabela.forEach(p => {
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50";
@@ -810,7 +817,7 @@
             });
         }
 
-        // Cadastro Personalizado de Escala com Regiões Dinâmicas (Seg-Sex vs Fim de Semana) e Datas Livres
+        // Cadastro Personalizado de Escala com Regiões Dinâmicas (Seg-Sex vs Fim de Semana)
         async function salvarEscalaSemanalSupervisores() {
             const supervisor = document.getElementById('weeklySupervisorSelect').value;
             const sigla = document.getElementById('weeklyScaleType').value;
