@@ -460,7 +460,7 @@
             "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
         ];
 
-        // Renderização do Calendário e Tabela Admin com Ordenação Cronológica Perfeita
+        // Renderização do Calendário e Tabela Admin com Ordenação Cronológica Perfeita e por Horário
         function render() {
             const grid = document.getElementById('calendarGrid');
             const selectMesAno = document.getElementById('selectMesAno');
@@ -477,11 +477,16 @@
                 adminTableBody.innerHTML = '';
                 const dadosTabela = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
                 
-                // ORDENAÇÃO CRONOLÓGICA PERFEITA (Do dia 1 para frente no formato DD/MM/AAAA)
+                // Ordenação cronológica por data e desempate por horário
                 dadosTabela.sort((a, b) => {
                     const d1 = a.data.split('/').reverse().join('');
                     const d2 = b.data.split('/').reverse().join('');
-                    return d1.localeCompare(d2);
+                    if (d1 !== d2) return d1.localeCompare(d2);
+                    
+                    if (modoAtual === 'cgr') {
+                        return (a.horario || '').localeCompare(b.horario || '');
+                    }
+                    return 0;
                 });
 
                 dadosTabela.forEach(p => {
@@ -589,7 +594,7 @@
             document.getElementById('countFeriados').innerText = c2;
         }
 
-        // Função de Exportação em PDF com Tabela Ordenada Cronologicamente
+        // Função de Exportação em PDF com Tabela Ordenada Cronologicamente e por Horário
         function exportarTabelaPDF() {
             const dados = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
             const tituloPainel = modoAtual === 'cgr' ? "Escala CGR" : "Escala de Supervisores";
@@ -599,11 +604,16 @@
                 return;
             }
 
-            // Ordena os registros por data para o PDF sair em ordem cronológica perfeita
+            // Ordena os registros por data e desempata por horário para o PDF sair em ordem cronológica perfeita
             dados.sort((a, b) => {
                 const d1 = a.data.split('/').reverse().join('');
                 const d2 = b.data.split('/').reverse().join('');
-                return d1.localeCompare(d2);
+                if (d1 !== d2) return d1.localeCompare(d2);
+
+                if (modoAtual === 'cgr') {
+                    return (a.horario || '').localeCompare(b.horario || '');
+                }
+                return 0;
             });
 
             let iframe = document.createElement('iframe');
@@ -673,6 +683,7 @@
             }, 300);
         }
 
+        // Modal Detalhes do Dia Ordenado por Horário de Início
         function abrirModalDetalhesDia(dataStr, registros) {
             const modal = document.getElementById('modalDetalhesDia');
             const titulo = document.getElementById('modalDetalhesTitulo');
@@ -681,7 +692,16 @@
             titulo.innerHTML = `<i class="fa-solid fa-calendar-day text-blue-600"></i> Escala do dia ${dataStr}`;
             conteudo.innerHTML = '';
 
-            registros.forEach(r => {
+            const registrosOrdenados = [...registros].sort((a, b) => {
+                if (modoAtual === 'cgr') {
+                    const hA = (a.horario || '').trim();
+                    const hB = (b.horario || '').trim();
+                    return hA.localeCompare(hB);
+                }
+                return (a.supervisor || '').localeCompare(b.supervisor || '');
+            });
+
+            registrosOrdenados.forEach(r => {
                 const item = document.createElement('div');
                 item.className = "bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs space-y-1";
 
