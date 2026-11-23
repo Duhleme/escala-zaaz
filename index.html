@@ -537,17 +537,23 @@
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${cls}">${setor}</span>`;
         }
 
-        function correspondeAoFiltroSetor(setorStr, chaveFiltro) {
+        // Verifica estritamente o setor e a tratativa para evitar que DIG-CHAT apareça em GPON/Frontline ou que outros turnos apareçam em IVR
+        function correspondeAoFiltroSetor(registro, chaveFiltro) {
             if (chaveFiltro === 'TODOS') return true;
-            const s = (setorStr || '').toUpperCase().trim();
+            const s = (registro.setor || '').toUpperCase().trim();
+            const t = (registro.tratativa || '').toUpperCase().trim();
+
+            if (chaveFiltro === 'DIG-CHAT') {
+                return s === 'DIG-CHAT' || t.includes('DIG-CHAT') || t.includes('DIG CHAT');
+            }
             if (chaveFiltro === 'IVR_TELEFONIA') {
-                return s === 'NOC IVR / TELEFONIA' || s.includes('IVR') || s.includes('TELEFONIA') || s.includes('TELFONIA');
+                return s === 'NOC IVR / TELEFONIA';
             }
             if (chaveFiltro === 'GPON') {
-                return s === 'NOC GPON' || s.includes('GPON');
+                return (s === 'NOC GPON' || s.includes('GPON')) && !t.includes('DIG-CHAT') && !t.includes('DIG CHAT');
             }
             if (chaveFiltro === 'FRONTLINE') {
-                return s === 'NOC FRONTLINE';
+                return s === 'NOC FRONTLINE' && !t.includes('DIG-CHAT') && !t.includes('DIG CHAT');
             }
             return s.includes(chaveFiltro);
         }
@@ -804,7 +810,7 @@
             let listaFiltrada = [...registrosDiaAtual];
             if (modoAtual === 'cgr' && setorFiltroModalAtual !== 'TODOS') {
                 listaFiltrada = listaFiltrada.filter(r =>
-                    correspondeAoFiltroSetor(r.setor, setorFiltroModalAtual)
+                    correspondeAoFiltroSetor(r, setorFiltroModalAtual)
                 );
             }
 
@@ -890,7 +896,7 @@
 
                     const setoresDisponiveis = opcoesSetor.filter(op =>
                         op.key === 'TODOS' ||
-                        registrosDiaAtual.some(r => correspondeAoFiltroSetor(r.setor, op.key))
+                        registrosDiaAtual.some(r => correspondeAoFiltroSetor(r, op.key))
                     );
 
                     if (setoresDisponiveis.length > 1) {
@@ -1086,7 +1092,10 @@
             if (tUp.includes('DIG-CHAT') || tUp.includes('DIG CHAT')) {
                 return 'DIG-CHAT';
             }
-            if (tUp.includes('TELEFONIA') || tUp.includes('TELFONIA') || tUp.includes('IVR')) {
+            if ((tUp.includes('TELEFONIA') || tUp.includes('TELFONIA') || tUp.includes('DEMANDAS DE TELEFONIA')) && !tUp.includes('GPON')) {
+                return 'NOC IVR / TELEFONIA';
+            }
+            if (tUp.includes('REDE IVR') || tUp.includes('MONITORAMENTO REDE IVR') || tUp.includes('MONITORAMENTO IVR')) {
                 return 'NOC IVR / TELEFONIA';
             }
             if (tUp.includes('GPON') || tUp.includes('GON')) {
