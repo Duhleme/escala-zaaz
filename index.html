@@ -1028,7 +1028,16 @@
             return limpo;
         }
 
-        // Verifica se a linha parece ser descrição/atividade e não nome de colaborador
+        function ehNomeReconhecidoNaEquipe(texto) {
+            const limpo = texto.replace(/[—–-]/g, '').trim().toUpperCase();
+            if (!limpo) return false;
+            return equipeCgr.some(m => {
+                const alvo = m.nome.toUpperCase();
+                const partes = limpo.split(/\s+/);
+                return alvo === limpo || partes.every(p => alvo.includes(p));
+            });
+        }
+
         function pareceAtividadeOuTratativa(texto) {
             const up = texto.toUpperCase().trim();
             const palavrasAtividade = [
@@ -1036,18 +1045,31 @@
                 'DIG-CHAT', 'DIG CHAT', 'DEMANDAS', 'INCLUIR', 'ASSUMIR',
                 'COBRANÇA', 'COBRANCA', 'INCIDENTES', 'ALARMES', 'TRATATIVA',
                 'TRATATIVAS', 'TELEFONIA', 'VIABILIDADE', 'VIABILIDADES',
-                'SUPORTE', 'CHAT', 'PARALELO', 'INTERVALO', 'COBRE'
+                'SUPORTE', 'CHAT', 'PARALELO', 'INTERVALO', 'COBRE', 'GPON', 'CORE', 'IVR'
             ];
             return palavrasAtividade.some(p => up.includes(p));
         }
 
-        // Refina o setor da faixa caso a tratativa mencione explicitamente GPON ou CORE
+        // Formata uma linha de horário e separa faixas duplas coladas (ex: "08:00 às 11:00 15:00 às 17:00" -> "08:00 às 11:00 | 15:00 às 17:00")
+        function formatarLinhaHorario(textoHorario) {
+            let limpo = textoHorario.replace(/^[•\u2022\u27A1\uFE0F\u0003—–-]+\s*/, '').trim();
+            limpo = limpo.replace(/(\d{2}:\d{2})\s+(?=\d{2}:\d{2}\s*(?:às|as|-|–|—))/gi, '$1 | ');
+            return limpo.trim();
+        }
+
+        // Verifica se a linha começa com marcador/travessão seguido de faixa de horário (ex: "— 08:00 às 11:00..." ou "— 13:00 às 15:00")
+        function ehLinhaFaixaHorario(linha) {
+            const semMarcador = linha.replace(/^[•\u2022\u27A1\uFE0F\u0003—–-]+\s*/, '').trim();
+            return /^\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i.test(semMarcador);
+        }
+
+        // Ajusta o setor da faixa quando a tratativa menciona GPON ou CORE
         function refinarSetorPorTratativa(setorBase, tratativaTexto) {
             const tUp = (tratativaTexto || '').toUpperCase();
-            if (tUp.includes('REDE GPON') || tUp.includes('MONITORAMENTO GPON')) {
+            if (tUp.includes('GPON')) {
                 return 'NOC GPON';
             }
-            if (tUp.includes('REDE CORE') || tUp.includes('MONITORAMENTO CORE')) {
+            if (tUp.includes('CORE')) {
                 return 'NOC CORE';
             }
             return setorBase;
@@ -1120,6 +1142,7 @@
                 const ehNomeIsolado = /^[A-Za-zÀ-ÿ\s]{2,30}$/.test(line) && 
                                       !regexSetor.test(line) && 
                                       !pareceAtividadeOuTratativa(line) &&
+                                      ehNomeReconhecidoNaEquipe(line) &&
                                       (i + 1 < lines.length && regexHorario.test(lines[i + 1]));
 
                 if (matchNomeComHorario && !pareceAtividadeOuTratativa(matchNomeComHorario[1])) {
@@ -1129,7 +1152,7 @@
                         setor: setorAtual
                     };
                     faixaAtual = {
-                        horario: matchNomeComHorario[2].trim(),
+                        horario: formatarLinhaHorario(matchNomeComHorario[2]),
                         tratativas: []
                     };
                 } else if (ehNomeIsolado) {
@@ -1143,10 +1166,10 @@
                     const linhaLimpa = line.replace(/^[•\u2022\u27A1\uFE0F\u0003—–-]+\s*/, '').trim();
                     if (!linhaLimpa) continue;
 
-                    if (regexHorario.test(linhaLimpa)) {
+                    if (ehLinhaFaixaHorario(line)) {
                         fecharFaixa();
                         faixaAtual = {
-                            horario: linhaLimpa,
+                            horario: formatarLinhaHorario(linhaLimpa),
                             tratativas: []
                         };
                     } else {
