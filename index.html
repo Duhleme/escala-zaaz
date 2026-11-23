@@ -264,6 +264,7 @@
                                 <option value="NOC B2B">NOC B2B</option>
                                 <option value="ATIVIDADES GERAIS NOC">ATIVIDADES GERAIS NOC</option>
                                 <option value="ESCALA NOTURNA">ESCALA NOTURNA</option>
+                                <option value="DIG-CHAT">DIG-CHAT</option>
                             </select>
                         </div>
                         <div>
@@ -532,17 +533,21 @@
             else if (s.includes('GPON') || s.includes('GON')) cls = 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
             else if (s.includes('NOTURNA')) cls = 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300';
             else if (s.includes('B2B')) cls = 'bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-300';
+            else if (s.includes('DIG-CHAT') || s.includes('CHAT')) cls = 'bg-fuchsia-100 dark:bg-fuchsia-900/50 text-fuchsia-800 dark:text-fuchsia-300';
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${cls}">${setor}</span>`;
         }
 
         function correspondeAoFiltroSetor(setorStr, chaveFiltro) {
             if (chaveFiltro === 'TODOS') return true;
-            const s = (setorStr || '').toUpperCase();
+            const s = (setorStr || '').toUpperCase().trim();
             if (chaveFiltro === 'IVR_TELEFONIA') {
-                return s.includes('IVR') || s.includes('TELEFONIA') || s.includes('TELFONIA');
+                return s === 'NOC IVR / TELEFONIA' || s.includes('IVR') || s.includes('TELEFONIA') || s.includes('TELFONIA');
             }
             if (chaveFiltro === 'GPON') {
-                return s.includes('GPON') || s.includes('GON');
+                return s === 'NOC GPON' || s.includes('GPON');
+            }
+            if (chaveFiltro === 'FRONTLINE') {
+                return s === 'NOC FRONTLINE';
             }
             return s.includes(chaveFiltro);
         }
@@ -879,6 +884,7 @@
                         { key: 'B2B', label: 'B2B' },
                         { key: 'GERAIS', label: 'Atividades Gerais' },
                         { key: 'NOTURNA', label: 'Noturna' },
+                        { key: 'DIG-CHAT', label: 'DIG-CHAT' },
                         { key: 'PLANTÃO CGR', label: 'Plantão CGR' }
                     ];
 
@@ -1073,10 +1079,14 @@
             return /^\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i.test(semMarcador);
         }
 
-        // Prioriza a tratativa específica da faixa antes de cair em cabeçalho misto
+        // Define o setor da faixa de acordo com a atividade específica daquela faixa
         function refinarSetorPorTratativa(setorBase, tratativaTexto) {
             const tUp = (tratativaTexto || '').toUpperCase();
-            if (tUp.includes('IVR') || tUp.includes('TELEFONIA') || tUp.includes('TELFONIA')) {
+
+            if (tUp.includes('DIG-CHAT') || tUp.includes('DIG CHAT')) {
+                return 'DIG-CHAT';
+            }
+            if (tUp.includes('TELEFONIA') || tUp.includes('TELFONIA') || tUp.includes('IVR')) {
                 return 'NOC IVR / TELEFONIA';
             }
             if (tUp.includes('GPON') || tUp.includes('GON')) {
