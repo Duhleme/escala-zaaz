@@ -262,6 +262,7 @@
                                 <option value="NOC GPON">NOC GPON</option>
                                 <option value="NOC IVR">NOC IVR</option>
                                 <option value="NOC TELEFONIA">NOC TELEFONIA</option>
+                                <option value="NOC CORE / IVR">NOC CORE / IVR</option>
                                 <option value="NOC B2B">NOC B2B</option>
                                 <option value="ATIVIDADES GERAIS NOC">ATIVIDADES GERAIS NOC</option>
                                 <option value="ESCALA NOTURNA">ESCALA NOTURNA</option>
@@ -538,6 +539,7 @@
             const s = normalizarTexto(setor);
             let cls = 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300';
             if (s === 'NOC TELEFONIA' || s.includes('TELEFONIA') || s.includes('TELFONIA')) cls = 'bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300';
+            else if (s === 'NOC CORE / IVR') cls = 'bg-violet-100 dark:bg-violet-900/50 text-violet-800 dark:text-violet-300';
             else if (s === 'NOC IVR' || s.includes('IVR')) cls = 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300';
             else if (s.includes('FRONTLINE')) cls = 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300';
             else if (s.includes('CORE')) cls = 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300';
@@ -557,10 +559,13 @@
                 return s === 'DIG-CHAT' || t.includes('DIG-CHAT') || t.includes('DIG CHAT');
             }
             if (chaveFiltro === 'IVR') {
-                return s === 'NOC IVR' || (!s.includes('TELEFONIA') && !s.includes('TELFONIA') && t.includes('IVR'));
+                return s === 'NOC IVR' || s === 'NOC CORE / IVR' || (!s.includes('TELEFONIA') && !s.includes('TELFONIA') && t.includes('IVR'));
             }
             if (chaveFiltro === 'TELEFONIA') {
                 return s === 'NOC TELEFONIA' || s.includes('TELEFONIA') || s.includes('TELFONIA') || t.includes('TELEFONIA') || t.includes('TELFONIA');
+            }
+            if (chaveFiltro === 'CORE') {
+                return s === 'NOC CORE' || s === 'NOC CORE / IVR' || s.includes('CORE') || t.includes('CORE');
             }
             if (chaveFiltro === 'GPON') {
                 return (s === 'NOC GPON' || s.includes('GPON')) && !t.includes('DIG-CHAT') && !t.includes('DIG CHAT');
@@ -1099,7 +1104,7 @@
             return /^\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i.test(semMarcador);
         }
 
-        // Separa estritamente IVR e Telefonia conforme a tratativa da faixa
+        // Reconhece combinações como CORE e IVR, separando IVR e Telefonia
         function refinarSetorPorTratativa(setorBase, tratativaTexto) {
             const tUp = normalizarTexto(tratativaTexto);
 
@@ -1108,6 +1113,9 @@
             }
             if (tUp.includes('TELEFONIA') || tUp.includes('TELFONIA') || tUp.includes('DEMANDAS DE TELEFONIA')) {
                 return 'NOC TELEFONIA';
+            }
+            if (tUp.includes('CORE') && tUp.includes('IVR')) {
+                return 'NOC CORE / IVR';
             }
             if (tUp.includes('IVR')) {
                 return 'NOC IVR';
