@@ -260,7 +260,8 @@
                                 <option value="NOC FRONTLINE">NOC FRONTLINE</option>
                                 <option value="NOC CORE">NOC CORE</option>
                                 <option value="NOC GPON">NOC GPON</option>
-                                <option value="NOC IVR / TELEFONIA">NOC IVR / TELEFONIA</option>
+                                <option value="NOC IVR">NOC IVR</option>
+                                <option value="NOC TELEFONIA">NOC TELEFONIA</option>
                                 <option value="NOC B2B">NOC B2B</option>
                                 <option value="ATIVIDADES GERAIS NOC">ATIVIDADES GERAIS NOC</option>
                                 <option value="ESCALA NOTURNA">ESCALA NOTURNA</option>
@@ -487,6 +488,15 @@
         let registrosDiaAtual = [];
         let setorFiltroModalAtual = 'TODOS';
 
+        function normalizarTexto(texto) {
+            return (texto || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toUpperCase();
+        }
+
         function toggleDarkMode() {
             const html = document.documentElement;
             const icon = document.getElementById('themeIcon');
@@ -525,9 +535,10 @@
 
         function getBadgeSetor(setor) {
             if (!setor) return '';
-            const s = setor.toUpperCase();
+            const s = normalizarTexto(setor);
             let cls = 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300';
-            if (s.includes('IVR') || s.includes('TELEFONIA') || s.includes('TELFONIA')) cls = 'bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300';
+            if (s === 'NOC TELEFONIA' || s.includes('TELEFONIA') || s.includes('TELFONIA')) cls = 'bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300';
+            else if (s === 'NOC IVR' || s.includes('IVR')) cls = 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300';
             else if (s.includes('FRONTLINE')) cls = 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300';
             else if (s.includes('CORE')) cls = 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300';
             else if (s.includes('GPON') || s.includes('GON')) cls = 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
@@ -537,17 +548,19 @@
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${cls}">${setor}</span>`;
         }
 
-        // Verifica estritamente o setor e a tratativa para evitar que DIG-CHAT apareça em GPON/Frontline ou que outros turnos apareçam em IVR
         function correspondeAoFiltroSetor(registro, chaveFiltro) {
             if (chaveFiltro === 'TODOS') return true;
-            const s = (registro.setor || '').toUpperCase().trim();
-            const t = (registro.tratativa || '').toUpperCase().trim();
+            const s = normalizarTexto(registro.setor);
+            const t = normalizarTexto(registro.tratativa);
 
             if (chaveFiltro === 'DIG-CHAT') {
                 return s === 'DIG-CHAT' || t.includes('DIG-CHAT') || t.includes('DIG CHAT');
             }
-            if (chaveFiltro === 'IVR_TELEFONIA') {
-                return s === 'NOC IVR / TELEFONIA';
+            if (chaveFiltro === 'IVR') {
+                return s === 'NOC IVR' || (!s.includes('TELEFONIA') && !s.includes('TELFONIA') && t.includes('IVR'));
+            }
+            if (chaveFiltro === 'TELEFONIA') {
+                return s === 'NOC TELEFONIA' || s.includes('TELEFONIA') || s.includes('TELFONIA') || t.includes('TELEFONIA') || t.includes('TELFONIA');
             }
             if (chaveFiltro === 'GPON') {
                 return (s === 'NOC GPON' || s.includes('GPON')) && !t.includes('DIG-CHAT') && !t.includes('DIG CHAT');
@@ -555,7 +568,7 @@
             if (chaveFiltro === 'FRONTLINE') {
                 return s === 'NOC FRONTLINE' && !t.includes('DIG-CHAT') && !t.includes('DIG CHAT');
             }
-            return s.includes(chaveFiltro);
+            return s.includes(normalizarTexto(chaveFiltro));
         }
 
         function render() {
@@ -631,7 +644,7 @@
             const dataHojeFormatada = `${diaHojeStr}/${mesHojeStr}/${anoHojeStr}`;
 
             const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-            const search = document.getElementById('searchInput').value.toLowerCase();
+            const search = normalizarTexto(document.getElementById('searchInput').value).toLowerCase();
 
             let c1 = 0, c2 = 0;
 
@@ -644,11 +657,11 @@
 
                 if(search) {
                     registrosDoDia = registrosDoDia.filter(p => {
-                        const nome = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
-                        const setor = (p.setor || '').toLowerCase();
-                        const tratativa = (p.tratativa || '').toLowerCase();
-                        return nome.toLowerCase().includes(search) || 
-                               p.diaSemana.toLowerCase().includes(search) ||
+                        const nome = normalizarTexto(modoAtual === 'cgr' ? p.plantonista : p.supervisor).toLowerCase();
+                        const setor = normalizarTexto(p.setor).toLowerCase();
+                        const tratativa = normalizarTexto(p.tratativa).toLowerCase();
+                        return nome.includes(search) || 
+                               normalizarTexto(p.diaSemana).toLowerCase().includes(search) ||
                                setor.includes(search) ||
                                tratativa.includes(search);
                     });
@@ -883,12 +896,13 @@
                 if (modoAtual === 'cgr') {
                     const opcoesSetor = [
                         { key: 'TODOS', label: 'Todos' },
-                        { key: 'IVR_TELEFONIA', label: 'IVR / Telefonia' },
+                        { key: 'IVR', label: 'IVR' },
+                        { key: 'TELEFONIA', label: 'Telefonia' },
                         { key: 'FRONTLINE', label: 'Frontline' },
                         { key: 'CORE', label: 'Core' },
                         { key: 'GPON', label: 'GPON' },
                         { key: 'B2B', label: 'B2B' },
-                        { key: 'GERAIS', label: 'Atividades Internas' },
+                        { key: 'GERAIS', label: 'Atividade Internas' },
                         { key: 'NOTURNA', label: 'Noturna' },
                         { key: 'DIG-CHAT', label: 'DIG-CHAT' },
                         { key: 'PLANTÃO CGR', label: 'Plantão CGR' }
@@ -1036,15 +1050,15 @@
         }
 
         function resolverNomeColaboradorCgr(nomeCurto) {
-            const limpo = nomeCurto.replace(/[—–-]/g, '').trim().toUpperCase();
+            const limpo = normalizarTexto(nomeCurto.replace(/[—–-]/g, ''));
             if (!limpo) return '';
 
-            const exato = equipeCgr.find(m => m.nome.toUpperCase() === limpo);
+            const exato = equipeCgr.find(m => normalizarTexto(m.nome) === limpo);
             if (exato) return exato.nome.toUpperCase();
 
             const partes = limpo.split(/\s+/);
             const porTodasPartes = equipeCgr.find(m => {
-                const alvo = m.nome.toUpperCase();
+                const alvo = normalizarTexto(m.nome);
                 return partes.every(p => alvo.includes(p));
             });
             if (porTodasPartes) return porTodasPartes.nome.toUpperCase();
@@ -1053,22 +1067,22 @@
         }
 
         function ehNomeReconhecidoNaEquipe(texto) {
-            const limpo = texto.replace(/[—–-]/g, '').trim().toUpperCase();
+            const limpo = normalizarTexto(texto.replace(/[—–-]/g, ''));
             if (!limpo) return false;
             return equipeCgr.some(m => {
-                const alvo = m.nome.toUpperCase();
+                const alvo = normalizarTexto(m.nome);
                 const partes = limpo.split(/\s+/);
                 return alvo === limpo || partes.every(p => alvo.includes(p));
             });
         }
 
         function pareceAtividadeOuTratativa(texto) {
-            const up = texto.toUpperCase().trim();
+            const up = normalizarTexto(texto);
             const palavrasAtividade = [
                 'ATIVIDA', 'ATIVIDADES', 'INTERNAS', 'INTERNO', 'MONITORAMENTO',
                 'DIG-CHAT', 'DIG CHAT', 'DEMANDAS', 'INCLUIR', 'ASSUMIR',
-                'COBRANÇA', 'COBRANCA', 'INCIDENTES', 'ALARMES', 'TRATATIVA',
-                'TRATATIVAS', 'TELEFONIA', 'VIABILIDADE', 'VIABILIDADES',
+                'COBRANCA', 'INCIDENTES', 'ALARMES', 'TRATATIVA',
+                'TRATATIVAS', 'TELEFONIA', 'TELFONIA', 'VIABILIDADE', 'VIABILIDADES',
                 'SUPORTE', 'CHAT', 'PARALELO', 'INTERVALO', 'COBRE', 'GPON', 'CORE', 'IVR'
             ];
             return palavrasAtividade.some(p => up.includes(p));
@@ -1085,18 +1099,18 @@
             return /^\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i.test(semMarcador);
         }
 
-        // Define o setor da faixa de acordo com a atividade específica daquela faixa
+        // Separa estritamente IVR e Telefonia conforme a tratativa da faixa
         function refinarSetorPorTratativa(setorBase, tratativaTexto) {
-            const tUp = (tratativaTexto || '').toUpperCase();
+            const tUp = normalizarTexto(tratativaTexto);
 
             if (tUp.includes('DIG-CHAT') || tUp.includes('DIG CHAT')) {
                 return 'DIG-CHAT';
             }
-            if ((tUp.includes('TELEFONIA') || tUp.includes('TELFONIA') || tUp.includes('DEMANDAS DE TELEFONIA')) && !tUp.includes('GPON')) {
-                return 'NOC IVR / TELEFONIA';
+            if (tUp.includes('TELEFONIA') || tUp.includes('TELFONIA') || tUp.includes('DEMANDAS DE TELEFONIA')) {
+                return 'NOC TELEFONIA';
             }
-            if (tUp.includes('REDE IVR') || tUp.includes('MONITORAMENTO REDE IVR') || tUp.includes('MONITORAMENTO IVR')) {
-                return 'NOC IVR / TELEFONIA';
+            if (tUp.includes('IVR')) {
+                return 'NOC IVR';
             }
             if (tUp.includes('GPON') || tUp.includes('GON')) {
                 return 'NOC GPON';
@@ -1105,8 +1119,8 @@
                 return 'NOC CORE';
             }
 
-            const sUp = (setorBase || '').toUpperCase();
-            if (sUp.includes('FRONTLINE') && !sUp.includes('IVR') && !sUp.includes('TELEFONIA') && !sUp.includes('GON')) {
+            const sUp = normalizarTexto(setorBase);
+            if (sUp.includes('FRONTLINE') && !sUp.includes('IVR') && !sUp.includes('TELEFONIA') && !sUp.includes('TELFONIA') && !sUp.includes('GON')) {
                 return 'NOC FRONTLINE';
             }
             return setorBase;
@@ -1229,7 +1243,7 @@
 
             const mapaUnicoBloco = new Map();
             blocosPorPessoa.forEach(reg => {
-                const chaveBloco = `${reg.plantonista.toUpperCase()}__${reg.horario.toUpperCase()}__${reg.tratativa.toUpperCase()}`;
+                const chaveBloco = `${normalizarTexto(reg.plantonista)}__${normalizarTexto(reg.horario)}__${normalizarTexto(reg.tratativa)}`;
                 if (!mapaUnicoBloco.has(chaveBloco)) {
                     mapaUnicoBloco.set(chaveBloco, reg);
                 }
@@ -1255,8 +1269,8 @@
                 for (const item of itensProntos) {
                     const existentes = plantoes.filter(p =>
                         p.data === dateStr &&
-                        (p.plantonista || '').toUpperCase() === item.plantonista.toUpperCase() &&
-                        (p.horario || '').trim().toUpperCase() === item.horario.trim().toUpperCase()
+                        normalizarTexto(p.plantonista) === normalizarTexto(item.plantonista) &&
+                        normalizarTexto(p.horario) === normalizarTexto(item.horario)
                     );
                     if (existentes.length > 0) {
                         conflitosDetectados.push({
@@ -1300,8 +1314,8 @@
                     for (const item of itensProntos) {
                         const existentes = plantoes.filter(p =>
                             p.data === dateStr &&
-                            (p.plantonista || '').toUpperCase() === item.plantonista.toUpperCase() &&
-                            (p.horario || '').trim().toUpperCase() === item.horario.trim().toUpperCase()
+                            normalizarTexto(p.plantonista) === normalizarTexto(item.plantonista) &&
+                            normalizarTexto(p.horario) === normalizarTexto(item.horario)
                         );
 
                         const payload = {
@@ -1559,7 +1573,7 @@
             const conflito = dadosAtuais.find(item => 
                 item.id !== idAtual && 
                 item.data === data && 
-                item[campoNome].toUpperCase() === nome.toUpperCase()
+                normalizarTexto(item[campoNome]) === normalizarTexto(nome)
             );
 
             return conflito;
@@ -1662,7 +1676,7 @@
 
             let addedCount = 0;
             const lines = rawText.split('\n');
-            const nomesEquipeCgr = equipeCgr.map(m => m.nome.toUpperCase());
+            const nomesEquipeCgr = equipeCgr.map(m => normalizarTexto(m.nome));
 
             for (let line of lines) {
                 let trimmedLine = line.trim();
@@ -1692,11 +1706,11 @@
                 }
 
                 let plantonistaEncontrado = "";
-                const remUp = remainder.toUpperCase();
+                const remNorm = normalizarTexto(remainder);
 
-                for (let nomeMembro of nomesEquipeCgr) {
-                    if (remUp.includes(nomeMembro)) {
-                        plantonistaEncontrado = nomeMembro;
+                for (let idx = 0; idx < nomesEquipeCgr.length; idx++) {
+                    if (remNorm.includes(nomesEquipeCgr[idx])) {
+                        plantonistaEncontrado = equipeCgr[idx].nome.toUpperCase();
                         break;
                     }
                 }
@@ -1704,9 +1718,9 @@
                 if (!plantonistaEncontrado) continue;
 
                 let tratativaEncontrada = "Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo";
-                if (remUp.includes("GPON")) {
+                if (remNorm.includes("GPON")) {
                     tratativaEncontrada = "Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo";
-                } else if (remUp.includes("NOTURNO")) {
+                } else if (remNorm.includes("NOTURNO")) {
                     tratativaEncontrada = "Monitoramento Noturno";
                 }
 
