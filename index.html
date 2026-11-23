@@ -57,7 +57,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">ZaaZ Telecom - Painel Operacional</h1>
-                        <p id="subHeaderTitle" class="text-xs text-blue-200 dark:text-gray-400">Escala CGR / NOC (Turnos, Fins de Semana e Feriados)</p>
+                        <p id="subHeaderTitle" class="text-xs text-blue-200 dark:text-gray-400">Escala CGR / NOC (Semanal, Fins de Semana e Feriados)</p>
                     </div>
                 </div>
 
@@ -234,7 +234,8 @@
                         <div>
                             <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Categoria</label>
                             <select id="manualCategoria" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="fds">Turno / Fim de Semana</option>
+                                <option value="noc_semanal">Escala Semanal NOC</option>
+                                <option value="fds">Fim de Semana / Plantão</option>
                                 <option value="feriados">Feriado Oficial</option>
                             </select>
                         </div>
@@ -312,15 +313,15 @@
                     </div>
                 </div>
 
-                <!-- NOVO BLOCO: Importação de Escala Semanal NOC (Blocos por Setor) -->
+                <!-- Importação de Escala Semanal NOC (Salva separado como noc_semanal) -->
                 <div id="containerNocWeeklyCgr" class="bg-sky-50/70 dark:bg-gray-800 p-4 rounded-xl border border-sky-200 dark:border-gray-700 space-y-3">
                     <div class="flex items-center justify-between">
                         <h4 class="font-semibold text-sm text-sky-900 dark:text-sky-300 flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-sky-600"></i> Importar Escala Semanal NOC (Por Frentes/Setores)
+                            <i class="fa-solid fa-layer-group text-sky-600"></i> Importar Escala Semanal NOC (Separado)
                         </h4>
-                        <span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 px-2 py-0.5 rounded font-semibold">Formato Planilha Semanal</span>
+                        <span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 px-2 py-0.5 rounded font-semibold">Categoria: Semanal NOC</span>
                     </div>
-                    <p class="text-[11px] text-gray-600 dark:text-gray-400">Cole abaixo o texto copiado da planilha semanal (com NOC FRONTLINE, NOC CORE, ESCALA NOTURNA, etc.) e selecione o período:</p>
+                    <p class="text-[11px] text-gray-600 dark:text-gray-400">Cole abaixo o texto copiado da planilha semanal e selecione o período:</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
@@ -342,17 +343,20 @@
                     <textarea id="nocWeeklyData" rows="5" placeholder="Cole aqui todo o texto da escala semanal (NOC FRONTLINE, NOC CORE, ESCALA NOTURNA...)" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
                     
                     <div class="flex justify-end">
-                        <button onclick="importarEscalaSemanalNoc()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                        <button onclick="importarEscalaSemanalNoc()" id="btnImportarNoc" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-60 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Processar Escala NOC e Salvar
                         </button>
                     </div>
                 </div>
 
-                <!-- Importação em Massa CGR (Linhas com Data) -->
+                <!-- Importação em Massa CGR (Fins de Semana / Feriados) -->
                 <div id="containerBulkCgr" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
-                    <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa CGR (Linhas com Data - Fins de Semana/Feriados)
-                    </h4>
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                            <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa CGR (Fins de Semana / Feriados)
+                        </h4>
+                        <span class="text-[10px] bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200 px-2 py-0.5 rounded font-semibold">Categoria: FDS / Feriados</span>
+                    </div>
                     <p class="text-[11px] text-gray-500 dark:text-gray-400">Cole abaixo as linhas da planilha que contêm a data no início (ex: 28/11/2026 ...):</p>
                     <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas com data..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     
@@ -428,15 +432,23 @@
                     </div>
                 </div>
 
-                <!-- Tabela de Gestão com Botão de Exportar PDF -->
+                <!-- Tabela de Gestão com Filtro por Tipo e Botão de Exportar PDF / Limpar Todos -->
                 <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300" id="adminTableTitle">Registros Cadastrados na Nuvem</h4>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300" id="adminTableTitle">Registros Cadastrados na Nuvem</h4>
+                            <select id="filtroTipoTabela" onchange="render()" class="bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg px-2.5 py-1 text-xs font-medium focus:outline-none">
+                                <option value="todos">Todos os Tipos</option>
+                                <option value="noc_semanal">Semanal NOC</option>
+                                <option value="fds">Fim de Semana / Plantão</option>
+                                <option value="feriados">Feriados</option>
+                            </select>
+                        </div>
                         <div class="flex items-center gap-2">
                             <button onclick="exportarTabelaPDF()" class="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-file-pdf"></i> Exportar PDF
                             </button>
-                            <button onclick="deleteAllItems()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                            <button onclick="deleteAllItems()" id="btnLimparTodos" class="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-trash-can"></i> Limpar Todos
                             </button>
                         </div>
@@ -497,7 +509,16 @@
             "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
         ];
 
-        // Cores por setor para visualização rápida no modal
+        function formatarBadgeCategoria(cat) {
+            if (cat === 'noc_semanal') {
+                return `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300">SEMANAL NOC</span>`;
+            }
+            if (cat === 'feriados') {
+                return `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300">FERIADO</span>`;
+            }
+            return `<span class="px-2 py-0.5 rounded text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300">FDS / PLANTÃO</span>`;
+        }
+
         function getBadgeSetor(setor) {
             if (!setor) return '';
             const s = setor.toUpperCase();
@@ -515,6 +536,7 @@
             const grid = document.getElementById('calendarGrid');
             const selectMesAno = document.getElementById('selectMesAno');
             const adminTableBody = document.getElementById('adminTableBody');
+            const filtroTipoTabela = document.getElementById('filtroTipoTabela');
             const thNome = document.getElementById('thColNome');
             const thDetalhe = document.getElementById('thColDetalhe');
             const labelCard1 = document.getElementById('labelCard1');
@@ -523,9 +545,18 @@
             if (thDetalhe) thDetalhe.innerText = modoAtual === 'cgr' ? "Horário / Setor" : "Status / Turno";
             if (labelCard1) labelCard1.innerText = modoAtual === 'cgr' ? "Turnos / Plantões Escalados" : "Dias Escalados no Mês";
 
+            if (filtroTipoTabela) {
+                filtroTipoTabela.style.display = modoAtual === 'cgr' ? 'inline-block' : 'none';
+            }
+
             if(adminTableBody) {
                 adminTableBody.innerHTML = '';
-                const dadosTabela = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
+                let dadosTabela = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
+                const tipoSelecionado = filtroTipoTabela ? filtroTipoTabela.value : 'todos';
+
+                if (modoAtual === 'cgr' && tipoSelecionado !== 'todos') {
+                    dadosTabela = dadosTabela.filter(item => item.categoria === tipoSelecionado);
+                }
                 
                 dadosTabela.sort((a, b) => {
                     const d1 = a.data.split('/').reverse().join('');
@@ -549,7 +580,7 @@
 
                     tr.innerHTML = `
                         <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${p.data} (${p.diaSemana})</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'}">${p.categoria.toUpperCase()}</span></td>
+                        <td class="p-3">${formatarBadgeCategoria(p.categoria)}</td>
                         <td class="p-3 text-gray-700 dark:text-gray-300 font-medium">${colNomeVal}</td>
                         <td class="p-3 text-gray-500 dark:text-gray-400">${colDetalheVal}</td>
                         <td class="p-3 text-right space-x-2">
@@ -599,7 +630,7 @@
 
                 registrosDoDia.forEach(r => {
                     if (modoAtual === 'cgr') {
-                        if (r.categoria === 'fds') c1++;
+                        if (r.categoria === 'fds' || r.categoria === 'noc_semanal') c1++;
                     } else {
                         c1++;
                     }
@@ -652,7 +683,12 @@
         }
 
         function exportarTabelaPDF() {
-            const dados = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
+            const filtroTipoTabela = document.getElementById('filtroTipoTabela');
+            const tipoSelecionado = filtroTipoTabela ? filtroTipoTabela.value : 'todos';
+            let dados = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
+            if (modoAtual === 'cgr' && tipoSelecionado !== 'todos') {
+                dados = dados.filter(item => item.categoria === tipoSelecionado);
+            }
             const tituloPainel = modoAtual === 'cgr' ? "Escala CGR / NOC" : "Escala de Supervisores";
 
             if (!dados || dados.length === 0) {
@@ -709,7 +745,8 @@
 
             dados.forEach(item => {
                 let nome = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
-                let tipoSetor = modoAtual === 'cgr' ? `${item.categoria.toUpperCase()}${item.setor ? ' - ' + item.setor : ''}` : item.categoria.toUpperCase();
+                let catLabel = item.categoria === 'noc_semanal' ? 'SEMANAL NOC' : item.categoria.toUpperCase();
+                let tipoSetor = modoAtual === 'cgr' ? `${catLabel}${item.setor ? ' - ' + item.setor : ''}` : catLabel;
                 let detalhe = modoAtual === 'cgr' ? `<b>${item.horario}</b><br>${item.tratativa}` : `${item.sigla} (${item.regioes || 'SP'})`;
                 htmlConteudo += `
                     <tr>
@@ -762,10 +799,11 @@
 
                 if (modoAtual === 'cgr') {
                     const badgeSetor = r.setor ? getBadgeSetor(r.setor) : '';
+                    const badgeCat = formatarBadgeCategoria(r.categoria);
                     item.innerHTML = `
-                        <div class="flex justify-between items-start gap-2">
+                        <div class="flex justify-between items-start gap-2 flex-wrap">
                             <span class="font-bold text-sm text-gray-800 dark:text-gray-100">${r.plantonista}</span>
-                            ${badgeSetor}
+                            <div class="flex items-center gap-1.5">${badgeCat}${badgeSetor}</div>
                         </div>
                         <div class="text-blue-600 dark:text-blue-400 font-medium"><i class="fa-regular fa-clock"></i> ${r.horario}</div>
                         <div class="text-gray-600 dark:text-gray-300 leading-relaxed"><strong>Tratativa:</strong> ${r.tratativa}</div>
@@ -903,16 +941,13 @@
             });
         }
 
-        // Resolve nome curto (ex: "Leme", "Francisco", "Leonardo Alves") para o nome completo cadastrado na equipe
         function resolverNomeColaboradorCgr(nomeCurto) {
             const limpo = nomeCurto.replace(/[—–-]/g, '').trim().toUpperCase();
             if (!limpo) return '';
 
-            // 1. Correspondência exata
             const exato = equipeCgr.find(m => m.nome.toUpperCase() === limpo);
             if (exato) return exato.nome.toUpperCase();
 
-            // 2. Todos os termos do nome curto estão contidos no nome completo (ex: "LEONARDO ALVES", "LUIZ AUGUSTO")
             const partes = limpo.split(/\s+/);
             const porTodasPartes = equipeCgr.find(m => {
                 const alvo = m.nome.toUpperCase();
@@ -920,12 +955,12 @@
             });
             if (porTodasPartes) return porTodasPartes.nome.toUpperCase();
 
-            // 3. Fallback: retorna o próprio nome em maiúsculo
             return limpo;
         }
 
-        // Importador Inteligente da Escala Semanal NOC (Blocos por Setor)
+        // Importador Inteligente da Escala Semanal NOC (Categoria separada noc_semanal)
         async function importarEscalaSemanalNoc() {
+            const btnImportar = document.getElementById('btnImportarNoc');
             const rawText = document.getElementById('nocWeeklyData').value;
             const startDateStr = document.getElementById('nocStartDate').value;
             const endDateStr = document.getElementById('nocEndDate').value;
@@ -946,7 +981,6 @@
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             const regexSetor = /^(NOC\s+.*|ATIVIDADES\s+GERAIS.*|ESCALA\s+NOTURNA.*)$/i;
-            // Identifica linha de nome: começa com letra (sem bullet/seta), contém horário OU é um nome curto isolado (ex: Romulo, Flavia, Wesley)
             const regexHorario = /\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i;
 
             let setorAtual = "NOC GERAL";
@@ -956,20 +990,15 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
 
-                // Ignora cabeçalho de período no topo (ex: 23/11/26 - 30/11/2026 (10:00))
                 if (/^\d{2}\/\d{2}\/\d{2,4}\s*-\s*\d{2}\/\d{2}\/\d{2,4}/.test(line)) continue;
 
-                // Detecta mudança de setor
                 if (regexSetor.test(line) && !regexHorario.test(line)) {
                     if (atual) { registrosBase.push(atual); atual = null; }
                     setorAtual = line.replace(/\s+/g, ' ').toUpperCase();
                     continue;
                 }
 
-                // Verifica se é início de um novo colaborador
-                // Padrão A: "Nome — 07:00 - 12:00 | 14:00 às 17:00"
                 const matchNomeComHorario = line.match(/^([A-Za-zÀ-ÿ\s]{2,35}?)\s*(?:—|–|-)\s*(\d{2}:\d{2}.*)$/);
-                // Padrão B: Nome sozinho na linha (ex: "Romulo", "Flavia", "Wesley") seguido de horário na próxima linha
                 const ehNomeIsolado = /^[A-Za-zÀ-ÿ\s]{2,30}$/.test(line) && 
                                       !regexSetor.test(line) && 
                                       (i + 1 < lines.length && regexHorario.test(lines[i + 1]));
@@ -991,7 +1020,6 @@
                         tratativas: []
                     };
                 } else if (atual) {
-                    // Linha pertence ao colaborador atual (pode ser faixa extra de horário ou descrição de tratativa)
                     const linhaLimpa = line.replace(/^[•\u2022\u27A1\uFE0F\u0003—–-]+\s*/, '').trim();
                     if (!linhaLimpa) continue;
 
@@ -1009,59 +1037,130 @@
                 return;
             }
 
-            // Monta o texto limpo de horário e tratativa para cada colaborador
-            const itensProntos = registrosBase.map(reg => {
+            const mapaUnicoBloco = new Map();
+            registrosBase.forEach(reg => {
                 const horarioFinal = reg.horarios.length > 0 ? reg.horarios.join(' | ') : 'Turno Integral';
-                // Remove repetições idênticas de tratativa caso existam
                 const tratativasUnicas = [...new Set(reg.tratativas)];
-                let tratativaFinal = tratativasUnicas.length > 0 
+                const tratativaFinal = tratativasUnicas.length > 0 
                     ? tratativasUnicas.join(' • ') 
                     : `Atendimento e rotinas ${reg.setor}`;
 
-                return {
-                    plantonista: reg.plantonista,
-                    setor: reg.setor,
-                    horario: horarioFinal,
-                    tratativa: tratativaFinal
-                };
+                const chaveBloco = `${reg.plantonista.toUpperCase()}__${horarioFinal.toUpperCase()}`;
+                if (!mapaUnicoBloco.has(chaveBloco)) {
+                    mapaUnicoBloco.set(chaveBloco, {
+                        plantonista: reg.plantonista,
+                        setor: reg.setor,
+                        horario: horarioFinal,
+                        tratativa: tratativaFinal
+                    });
+                }
             });
+            const itensProntos = Array.from(mapaUnicoBloco.values());
+
+            const datasAlvo = [];
+            let cursor = new Date(currDate);
+            while (cursor <= endDate) {
+                const diaSemanaNum = cursor.getDay();
+                const ehFimDeSemana = (diaSemanaNum === 0 || diaSemanaNum === 6);
+                if (!apenasUteis || !ehFimDeSemana) {
+                    const diaStr = String(cursor.getDate()).padStart(2, '0');
+                    const mesStr = String(cursor.getMonth() + 1).padStart(2, '0');
+                    const anoStr = cursor.getFullYear();
+                    datasAlvo.push(`${diaStr}/${mesStr}/${anoStr}`);
+                }
+                cursor.setDate(cursor.getDate() + 1);
+            }
+
+            const conflitosDetectados = [];
+            for (const dateStr of datasAlvo) {
+                for (const item of itensProntos) {
+                    const existentes = plantoes.filter(p =>
+                        p.data === dateStr &&
+                        (p.plantonista || '').toUpperCase() === item.plantonista.toUpperCase() &&
+                        (p.horario || '').trim().toUpperCase() === item.horario.trim().toUpperCase()
+                    );
+                    if (existentes.length > 0) {
+                        conflitosDetectados.push({
+                            data: dateStr,
+                            plantonista: item.plantonista,
+                            horario: item.horario,
+                            existentes
+                        });
+                    }
+                }
+            }
+
+            let sobrescreverConflitos = false;
+            if (conflitosDetectados.length > 0) {
+                const exemplo = conflitosDetectados[0];
+                const msg = `⚠️ JÁ EXISTEM REGISTROS NA DATA E HORÁRIO:\n\n` +
+                            `Foram encontrados ${conflitosDetectados.length} lançamento(s) já cadastrados para o mesmo agente, data e horário (ex: ${exemplo.plantonista} em ${exemplo.data} às ${exemplo.horario}).\n\n` +
+                            `Deseja ALTERAR / ATUALIZAR esses registros existentes (evitando duplicar)?\n` +
+                            `• Clique em OK para ALTERAR/ATUALIZAR os registros existentes.\n` +
+                            `• Clique em Cancelar para NÃO alterar os registros já lançados.`;
+                sobrescreverConflitos = confirm(msg);
+                if (!sobrescreverConflitos) {
+                    alert("Operação cancelada. Nenhum registro existente foi alterado ou duplicado.");
+                    return;
+                }
+            }
+
+            if (btnImportar) {
+                btnImportar.disabled = true;
+                btnImportar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Salvando na nuvem...`;
+            }
 
             let addedCount = 0;
+            let updatedCount = 0;
             const colecao = 'plantoes';
 
-            while (currDate <= endDate) {
-                const diaSemanaNum = currDate.getDay(); // 0 = Dom, 6 = Sáb
-                const ehFimDeSemana = (diaSemanaNum === 0 || diaSemanaNum === 6);
-
-                if (!apenasUteis || !ehFimDeSemana) {
-                    const diaStr = String(currDate.getDate()).padStart(2, '0');
-                    const mesStr = String(currDate.getMonth() + 1).padStart(2, '0');
-                    const anoStr = currDate.getFullYear();
-                    const dateStr = `${diaStr}/${mesStr}/${anoStr}`;
-                    const diaMesCurto = `${diaStr}/${mesStr}`;
+            try {
+                for (const dateStr of datasAlvo) {
                     const diaSemana = obterDiaDaSemana(dateStr);
-                    const categoria = FERIADOS_NACIONAIS.includes(diaMesCurto) ? 'feriados' : 'fds';
 
-                    for (let item of itensProntos) {
-                        const itemId = 'noc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-                        await window.setDoc(window.doc(window.db, colecao, itemId), {
-                            categoria,
+                    for (const item of itensProntos) {
+                        const existentes = plantoes.filter(p =>
+                            p.data === dateStr &&
+                            (p.plantonista || '').toUpperCase() === item.plantonista.toUpperCase() &&
+                            (p.horario || '').trim().toUpperCase() === item.horario.trim().toUpperCase()
+                        );
+
+                        const payload = {
+                            categoria: 'noc_semanal',
                             data: dateStr,
                             diaSemana,
                             plantonista: item.plantonista,
                             setor: item.setor,
                             horario: item.horario,
                             tratativa: item.tratativa
-                        });
-                        addedCount++;
+                        };
+
+                        if (existentes.length > 0 && sobrescreverConflitos) {
+                            await window.setDoc(window.doc(window.db, colecao, existentes[0].id), payload);
+                            updatedCount++;
+                            for (let extraIdx = 1; extraIdx < existentes.length; extraIdx++) {
+                                await window.deleteDoc(window.doc(window.db, colecao, existentes[extraIdx].id));
+                            }
+                        } else if (existentes.length === 0) {
+                            const itemId = 'noc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                            await window.setDoc(window.doc(window.db, colecao, itemId), payload);
+                            addedCount++;
+                        }
                     }
                 }
-                currDate.setDate(currDate.getDate() + 1);
-            }
 
-            alert(`Sucesso! ${itensProntos.length} escalas do NOC identificadas e ${addedCount} registros salvos no calendário.`);
-            document.getElementById('nocWeeklyData').value = '';
-            carregarPlantoesFirebase();
+                alert(`Concluído! ${addedCount} novo(s) registro(s) adicionado(s) e ${updatedCount} registro(s) atualizado(s).`);
+                document.getElementById('nocWeeklyData').value = '';
+                await carregarPlantoesFirebase();
+            } catch (err) {
+                console.error("Erro ao salvar escala NOC:", err);
+                alert("Ocorreu um erro ao salvar alguns registros na nuvem.");
+            } finally {
+                if (btnImportar) {
+                    btnImportar.disabled = false;
+                    btnImportar.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Processar Escala NOC e Salvar`;
+                }
+            }
         }
 
         async function salvarEscalaSemanalSupervisores() {
@@ -1224,7 +1323,7 @@
                 if(adminBtnCgr) adminBtnCgr.className = adminActiveClass;
                 if(adminBtnSup) adminBtnSup.className = adminInactiveClass;
 
-                if(subHeader) subHeader.innerText = "Escala CGR / NOC (Turnos, Fins de Semana e Feriados)";
+                if(subHeader) subHeader.innerText = "Escala CGR / NOC (Semanal, Fins de Semana e Feriados)";
                 if(label1) label1.innerText = "Turnos / Plantões Escalados";
                 if(label2) label2.innerText = "Feriados Escalados";
                 if(adminTitle) adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR / NOC';
@@ -1368,7 +1467,7 @@
             document.getElementById('editId').value = '';
             document.getElementById('manualData').value = '';
             document.getElementById('manualDiaSemana').value = '';
-            document.getElementById('manualCategoria').value = 'fds';
+            document.getElementById('manualCategoria').value = 'noc_semanal';
             document.querySelectorAll('input[name="regiaoSup"]').forEach(cb => cb.checked = false);
             document.getElementById('btnCancelEdit').classList.add('hidden');
             document.getElementById('btnSalvarManual').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar na Nuvem`;
@@ -1459,26 +1558,65 @@
                 try {
                     const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
                     await window.deleteDoc(window.doc(window.db, colecao, id));
-                    if(modoAtual === 'cgr') carregarPlantoesFirebase();
-                    else carregarSupervisoresFirebase();
+                    if(modoAtual === 'cgr') await carregarPlantoesFirebase();
+                    else await carregarSupervisoresFirebase();
                 } catch (error) { alert('Erro ao excluir.'); }
             }
         }
 
+        // Limpar Todos corrigido: exclui em lotes paralelos e atualiza o estado local/nuvem com segurança
         async function deleteAllItems() {
-            const dadosAtuais = modoAtual === 'cgr' ? plantoes : supervisores;
-            if(dadosAtuais.length === 0) { alert('Não há registros cadastrados para remover.'); return; }
+            const filtroTipoTabela = document.getElementById('filtroTipoTabela');
+            const tipoSelecionado = filtroTipoTabela ? filtroTipoTabela.value : 'todos';
+            let dadosAlvo = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
 
-            if(confirm('ATENÇÃO: Deseja excluir TODOS os registros da aba atual?')) {
-                try {
-                    const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
-                    for (let item of dadosAtuais) {
-                        await window.deleteDoc(window.doc(window.db, colecao, item.id));
-                    }
-                    alert('Registros removidos com sucesso!');
-                    if(modoAtual === 'cgr') carregarPlantoesFirebase();
-                    else carregarSupervisoresFirebase();
-                } catch (error) { alert('Erro ao limpar.'); }
+            if (modoAtual === 'cgr' && tipoSelecionado !== 'todos') {
+                dadosAlvo = dadosAlvo.filter(item => item.categoria === tipoSelecionado);
+            }
+
+            if(dadosAlvo.length === 0) {
+                alert('Não há registros para remover no filtro atual.');
+                return;
+            }
+
+            const descricaoEscopo = (modoAtual === 'cgr' && tipoSelecionado !== 'todos')
+                ? `os ${dadosAlvo.length} registro(s) filtrados (${tipoSelecionado})`
+                : `TODOS os ${dadosAlvo.length} registro(s) da aba atual`;
+
+            if(!confirm(`ATENÇÃO: Deseja excluir ${descricaoEscopo}?`)) return;
+
+            const btnLimpar = document.getElementById('btnLimparTodos');
+            if (btnLimpar) {
+                btnLimpar.disabled = true;
+                btnLimpar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Limpando...`;
+            }
+
+            try {
+                const colecao = modoAtual === 'cgr' ? 'plantoes' : 'supervisores';
+                const tamanhoLote = 25;
+
+                for (let i = 0; i < dadosAlvo.length; i += tamanhoLote) {
+                    const lote = dadosAlvo.slice(i, i + tamanhoLote);
+                    await Promise.all(
+                        lote.map(item => window.deleteDoc(window.doc(window.db, colecao, item.id)))
+                    );
+                }
+
+                if (modoAtual === 'cgr') {
+                    await carregarPlantoesFirebase();
+                } else {
+                    await carregarSupervisoresFirebase();
+                }
+
+                alert('Registros removidos com sucesso!');
+            } catch (error) {
+                console.error("Erro ao limpar registros:", error);
+                alert('Erro ao limpar os registros. Tente novamente.');
+            } finally {
+                if (btnLimpar) {
+                    btnLimpar.disabled = false;
+                    btnLimpar.innerHTML = `<i class="fa-solid fa-trash-can"></i> Limpar Todos`;
+                }
             }
         }
 
