@@ -142,7 +142,15 @@
                 </h3>
                 <button onclick="fecharModalDetalhesDia()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="modalFiltrosSetor" class="flex flex-wrap gap-1.5 hidden"></div>
+            <div class="flex flex-wrap items-center gap-1.5">
+                <div id="modalFiltrosSetor" class="flex flex-wrap gap-1.5 hidden"></div>
+                <div class="relative flex-grow min-w-[160px]">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-gray-400 text-xs">
+                        <i class="fa-solid fa-user-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="buscaColaboradorDia" oninput="renderizarListaModalDia()" placeholder="Filtrar por colaborador..." class="w-full pl-8 pr-3 py-1 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 rounded-lg text-[11px] focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
             <div id="modalDetalhesConteudo" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t dark:border-gray-700">
                 <button onclick="fecharModalDetalhesDia()" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500">Fechar</button>
@@ -826,14 +834,24 @@
 
         function renderizarListaModalDia() {
             const conteudo = document.getElementById('modalDetalhesConteudo');
+            const inputColab = document.getElementById('buscaColaboradorDia');
             if (!conteudo) return;
             conteudo.innerHTML = '';
+
+            const termoColab = inputColab ? normalizarTexto(inputColab.value) : '';
 
             let listaFiltrada = [...registrosDiaAtual];
             if (modoAtual === 'cgr' && setorFiltroModalAtual !== 'TODOS') {
                 listaFiltrada = listaFiltrada.filter(r =>
                     correspondeAoFiltroSetor(r, setorFiltroModalAtual)
                 );
+            }
+
+            if (termoColab) {
+                listaFiltrada = listaFiltrada.filter(r => {
+                    const nomeAlvo = normalizarTexto(modoAtual === 'cgr' ? r.plantonista : r.supervisor);
+                    return nomeAlvo.includes(termoColab);
+                });
             }
 
             const registrosOrdenados = listaFiltrada.sort((a, b) => {
@@ -846,7 +864,7 @@
             });
 
             if (registrosOrdenados.length === 0) {
-                conteudo.innerHTML = `<div class="text-xs text-gray-400 text-center py-6">Nenhum registro encontrado para este setor neste dia.</div>`;
+                conteudo.innerHTML = `<div class="text-xs text-gray-400 text-center py-6">Nenhum registro encontrado para este filtro neste dia.</div>`;
                 return;
             }
 
@@ -895,9 +913,14 @@
             const modal = document.getElementById('modalDetalhesDia');
             const titulo = document.getElementById('modalDetalhesTitulo');
             const filtrosContainer = document.getElementById('modalFiltrosSetor');
+            const inputColab = document.getElementById('buscaColaboradorDia');
 
             registrosDiaAtual = registros || [];
             setorFiltroModalAtual = 'TODOS';
+            if (inputColab) {
+                inputColab.value = '';
+                inputColab.placeholder = modoAtual === 'cgr' ? "Filtrar por colaborador..." : "Filtrar por supervisor...";
+            }
 
             titulo.innerHTML = `<i class="fa-solid fa-calendar-day text-blue-600"></i> Escala do dia ${dataStr}`;
 
@@ -942,6 +965,8 @@
         }
 
         function fecharModalDetalhesDia() {
+            const inputColab = document.getElementById('buscaColaboradorDia');
+            if (inputColab) inputColab.value = '';
             document.getElementById('modalDetalhesDia').classList.add('hidden');
         }
 
@@ -1108,7 +1133,6 @@
             return /^\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i.test(semMarcador);
         }
 
-        // Define o setor combinando frentes quando a tratativa reúne mais de uma função
         function refinarSetorPorTratativa(setorBase, tratativaTexto) {
             const tUp = normalizarTexto(tratativaTexto);
 
