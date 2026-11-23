@@ -57,33 +57,30 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">ZaaZ Telecom - Painel Operacional</h1>
-                        <p id="subHeaderTitle" class="text-xs text-blue-200 dark:text-gray-400">Escala CGR (Fins de Semana e Feriados)</p>
+                        <p id="subHeaderTitle" class="text-xs text-blue-200 dark:text-gray-400">Escala CGR / NOC (Turnos, Fins de Semana e Feriados)</p>
                     </div>
                 </div>
 
                 <!-- Botões de Ações e Alternância de Painel -->
                 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
-                    <!-- Botão Dark Mode -->
                     <button onclick="toggleDarkMode()" class="bg-blue-800/60 dark:bg-gray-800 hover:bg-blue-700 dark:hover:bg-gray-700 text-white p-2.5 rounded-xl text-sm shadow transition" title="Alternar Modo Escuro">
                         <i id="themeIcon" class="fa-solid fa-moon"></i>
                     </button>
 
-                    <!-- Abas CGR / Supervisores no Header -->
                     <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-xl flex gap-1 border border-blue-800 dark:border-gray-800">
                         <button id="btnTabCgr" onclick="mudarPainel('cgr')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 dark:bg-blue-700 text-white shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-headset"></i> CGR
+                            <i class="fa-solid fa-headset"></i> CGR / NOC
                         </button>
                         <button id="btnTabSup" onclick="mudarPainel('sup')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1.5">
                             <i class="fa-solid fa-user-tie"></i> Supervisores
                         </button>
                     </div>
 
-                    <!-- Campo Unificado de Busca e Filtro -->
-                    <div class="relative w-full sm:w-52">
+                    <div class="relative w-full sm:w-56">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
                             <i class="fa-solid fa-search"></i>
                         </span>
-                        <input type="text" id="searchInput" placeholder="Buscar nome ou data..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <input type="text" id="searchInput" placeholder="Buscar nome, setor ou data..." class="w-full pl-10 pr-4 py-2 bg-blue-800/60 dark:bg-gray-800 border border-blue-700 dark:border-gray-700 rounded-lg text-white placeholder-blue-300 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     </div>
 
                     <button onclick="checkAdminAccess()" class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow transition flex items-center gap-2 whitespace-nowrap">
@@ -98,7 +95,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between">
                     <div>
-                        <p id="labelCard1" class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fins de Semana Escalados</p>
+                        <p id="labelCard1" class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Turnos / Plantões Escalados</p>
                         <h3 id="countFds" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1">0</h3>
                     </div>
                     <div id="iconCard1Bg" class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 p-3 rounded-lg"><i id="iconCard1" class="fa-solid fa-mug-hot text-xl"></i></div>
@@ -138,14 +135,14 @@
 
     <!-- Modal Pop-up Detalhes do Dia (Calendário) -->
     <div id="modalDetalhesDia" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 space-y-4 border dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4 border dark:border-gray-700">
             <div class="flex justify-between items-center border-b dark:border-gray-700 pb-3">
                 <h3 id="modalDetalhesTitulo" class="font-bold text-sm text-blue-900 dark:text-blue-300 flex items-center gap-2">
                     <i class="fa-solid fa-calendar-day text-blue-600"></i> Detalhes da Escala
                 </h3>
                 <button onclick="fecharModalDetalhesDia()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="modalDetalhesConteudo" class="space-y-3 max-h-72 overflow-y-auto"></div>
+            <div id="modalDetalhesConteudo" class="space-y-3 max-h-[65vh] overflow-y-auto pr-1"></div>
             <div class="flex justify-end pt-2 border-t dark:border-gray-700">
                 <button onclick="fecharModalDetalhesDia()" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-500">Fechar</button>
             </div>
@@ -201,12 +198,12 @@
     <div id="adminModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden border dark:border-gray-700">
             <div class="bg-blue-900 dark:bg-gray-950 text-white px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 border-b dark:border-gray-800">
-                <h3 id="adminModalTitle" class="font-bold text-lg"><i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR</h3>
+                <h3 id="adminModalTitle" class="font-bold text-lg"><i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR / NOC</h3>
                 
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-950 dark:bg-gray-900 p-1 rounded-lg flex gap-1 border border-blue-800 dark:border-gray-800">
                         <button id="adminBtnCgr" onclick="mudarPainel('cgr')" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white shadow transition flex items-center gap-1">
-                            <i class="fa-solid fa-headset"></i> CGR
+                            <i class="fa-solid fa-headset"></i> CGR / NOC
                         </button>
                         <button id="adminBtnSup" onclick="mudarPainel('sup')" class="px-2.5 py-1 rounded-md text-xs font-semibold text-blue-200 dark:text-gray-400 hover:text-white transition flex items-center gap-1">
                             <i class="fa-solid fa-user-tie"></i> Supervisores
@@ -231,37 +228,45 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Data (Ex: 22/11/2026)</label>
+                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Data (Ex: 23/11/2026)</label>
                             <input type="text" id="manualData" placeholder="DD/MM/AAAA" maxlength="10" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Categoria</label>
                             <select id="manualCategoria" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="fds">Fim de Semana / Plantão Normal</option>
+                                <option value="fds">Turno / Fim de Semana</option>
                                 <option value="feriados">Feriado Oficial</option>
                             </select>
                         </div>
                     </div>
                     <input type="hidden" id="manualDiaSemana" value="">
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="containerCamposCgr">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="containerCamposCgr">
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-xs font-medium text-blue-900 dark:text-blue-300">Plantonista</label>
                                 <button onclick="openEquipeModal('cgr')" class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1">
-                                    <i class="fa-solid fa-gear"></i> Gerenciar Equipe
+                                    <i class="fa-solid fa-gear"></i> Equipe
                                 </button>
                             </div>
                             <select id="manualPlantonista" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Horário</label>
-                            <select id="manualHorario" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                <option value="07:00-13:00 / 14:00-16:00">07:00-13:00 / 14:00-16:00</option>
-                                <option value="13:00-18:00 / 19:00-22:00">13:00-18:00 / 19:00-22:00</option>
-                                <option value="13:00-19:00 / 20:00-22:00">13:00-19:00 / 20:00-22:00</option>
-                                <option value="22:00-02:00 / 03:00-07:00">22:00-02:00 / 03:00-07:00</option>
+                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Setor / Frente</label>
+                            <select id="manualSetor" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="PLANTÃO CGR">PLANTÃO CGR</option>
+                                <option value="NOC FRONTLINE">NOC FRONTLINE</option>
+                                <option value="NOC CORE">NOC CORE</option>
+                                <option value="NOC GPON">NOC GPON</option>
+                                <option value="NOC TELEFONIA">NOC TELEFONIA</option>
+                                <option value="NOC B2B">NOC B2B</option>
+                                <option value="ATIVIDADES GERAIS NOC">ATIVIDADES GERAIS NOC</option>
+                                <option value="ESCALA NOTURNA">ESCALA NOTURNA</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Horário</label>
+                            <input type="text" id="manualHorario" value="07:00-13:00 / 14:00-16:00" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
                     </div>
 
@@ -296,12 +301,8 @@
                     </div>
 
                     <div id="containerTratativa" class="block">
-                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Tratativa</label>
-                        <select id="manualTratativa" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo</option>
-                            <option value="Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo">Monitoramento da rede GPON (SP/PR/MG)/ Chat em paralelo</option>
-                            <option value="Monitoramento Noturno">Monitoramento Noturno</option>
-                        </select>
+                        <label class="block text-xs font-medium text-blue-900 dark:text-blue-300 mb-1">Tratativa / Atividade</label>
+                        <input type="text" id="manualTratativa" value="Monitoramento da rede CORE/IVR (SP/PR/MG)/ Chat em paralelo" class="w-full bg-white dark:bg-gray-900 border border-blue-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
 
                     <div class="flex justify-end pt-1">
@@ -311,13 +312,49 @@
                     </div>
                 </div>
 
-                <!-- SEÇÃO CONDICIONAL: Importação CGR / Cadastro de Escala -->
+                <!-- NOVO BLOCO: Importação de Escala Semanal NOC (Blocos por Setor) -->
+                <div id="containerNocWeeklyCgr" class="bg-sky-50/70 dark:bg-gray-800 p-4 rounded-xl border border-sky-200 dark:border-gray-700 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-semibold text-sm text-sky-900 dark:text-sky-300 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sky-600"></i> Importar Escala Semanal NOC (Por Frentes/Setores)
+                        </h4>
+                        <span class="text-[10px] bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-200 px-2 py-0.5 rounded font-semibold">Formato Planilha Semanal</span>
+                    </div>
+                    <p class="text-[11px] text-gray-600 dark:text-gray-400">Cole abaixo o texto copiado da planilha semanal (com NOC FRONTLINE, NOC CORE, ESCALA NOTURNA, etc.) e selecione o período:</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Data Início</label>
+                            <input type="date" id="nocStartDate" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Data Fim</label>
+                            <input type="date" id="nocEndDate" class="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-lg p-2 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        </div>
+                        <div class="flex items-end">
+                            <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 w-full text-xs font-medium">
+                                <input type="checkbox" id="nocApenasUteis" checked class="w-4 h-4 text-sky-600 rounded">
+                                <span>Somente Seg a Sex</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <textarea id="nocWeeklyData" rows="5" placeholder="Cole aqui todo o texto da escala semanal (NOC FRONTLINE, NOC CORE, ESCALA NOTURNA...)" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-sky-500 focus:outline-none"></textarea>
+                    
+                    <div class="flex justify-end">
+                        <button onclick="importarEscalaSemanalNoc()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Processar Escala NOC e Salvar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Importação em Massa CGR (Linhas com Data) -->
                 <div id="containerBulkCgr" class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
                     <h4 class="font-semibold text-sm text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa CGR
+                        <i class="fa-solid fa-file-arrow-down"></i> Importação em Massa CGR (Linhas com Data - Fins de Semana/Feriados)
                     </h4>
-                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Cole abaixo os dados copiados da planilha:</p>
-                    <textarea id="bulkData" rows="4" placeholder="Cole aqui a matriz copiada da planilha..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400">Cole abaixo as linhas da planilha que contêm a data no início (ex: 28/11/2026 ...):</p>
+                    <textarea id="bulkData" rows="3" placeholder="Cole aqui as linhas com data..." class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg p-2.5 text-xs font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
                         <label class="flex items-center gap-2 cursor-pointer bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -411,7 +448,7 @@
                                     <th class="p-3">Data</th>
                                     <th class="p-3">Tipo</th>
                                     <th class="p-3" id="thColNome">Plantonista</th>
-                                    <th class="p-3" id="thColDetalhe">Horário</th>
+                                    <th class="p-3" id="thColDetalhe">Horário / Setor</th>
                                     <th class="p-3 text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -460,7 +497,20 @@
             "01/01", "21/04", "01/05", "07/09", "12/10", "02/11", "15/11", "20/11", "25/12"
         ];
 
-        // Renderização do Calendário e Tabela Admin com Ordenação Cronológica Perfeita e por Horário
+        // Cores por setor para visualização rápida no modal
+        function getBadgeSetor(setor) {
+            if (!setor) return '';
+            const s = setor.toUpperCase();
+            let cls = 'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300';
+            if (s.includes('FRONTLINE')) cls = 'bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300';
+            else if (s.includes('CORE')) cls = 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300';
+            else if (s.includes('GPON')) cls = 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
+            else if (s.includes('NOTURNA')) cls = 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300';
+            else if (s.includes('B2B')) cls = 'bg-rose-100 dark:bg-rose-900/50 text-rose-800 dark:text-rose-300';
+            else if (s.includes('TELEFONIA')) cls = 'bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300';
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${cls}">${setor}</span>`;
+        }
+
         function render() {
             const grid = document.getElementById('calendarGrid');
             const selectMesAno = document.getElementById('selectMesAno');
@@ -470,14 +520,13 @@
             const labelCard1 = document.getElementById('labelCard1');
 
             if (thNome) thNome.innerText = modoAtual === 'cgr' ? "Plantonista" : "Supervisor";
-            if (thDetalhe) thDetalhe.innerText = modoAtual === 'cgr' ? "Horário" : "Status / Turno";
-            if (labelCard1) labelCard1.innerText = modoAtual === 'cgr' ? "Fins de Semana Escalados" : "Dias Escalados no Mês";
+            if (thDetalhe) thDetalhe.innerText = modoAtual === 'cgr' ? "Horário / Setor" : "Status / Turno";
+            if (labelCard1) labelCard1.innerText = modoAtual === 'cgr' ? "Turnos / Plantões Escalados" : "Dias Escalados no Mês";
 
             if(adminTableBody) {
                 adminTableBody.innerHTML = '';
                 const dadosTabela = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
                 
-                // Ordenação cronológica por data e desempate por horário
                 dadosTabela.sort((a, b) => {
                     const d1 = a.data.split('/').reverse().join('');
                     const d2 = b.data.split('/').reverse().join('');
@@ -493,12 +542,15 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50";
                     const colNomeVal = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
-                    const colDetalheVal = modoAtual === 'cgr' ? p.horario : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
+                    const setorTag = (modoAtual === 'cgr' && p.setor) ? `<div class="mt-0.5">${getBadgeSetor(p.setor)}</div>` : '';
+                    const colDetalheVal = modoAtual === 'cgr' 
+                        ? `<div>${p.horario}</div>${setorTag}` 
+                        : `<span class="font-bold px-2 py-0.5 rounded ${p.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-300'}">${p.sigla}</span> (${p.regioes || 'SP'})`;
 
                     tr.innerHTML = `
                         <td class="p-3 font-medium text-gray-800 dark:text-gray-200">${p.data} (${p.diaSemana})</td>
                         <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${p.categoria === 'fds' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300'}">${p.categoria.toUpperCase()}</span></td>
-                        <td class="p-3 text-gray-700 dark:text-gray-300">${colNomeVal}</td>
+                        <td class="p-3 text-gray-700 dark:text-gray-300 font-medium">${colNomeVal}</td>
                         <td class="p-3 text-gray-500 dark:text-gray-400">${colDetalheVal}</td>
                         <td class="p-3 text-right space-x-2">
                             <button onclick="prepararEdicao('${p.id}')" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -536,7 +588,12 @@
                 if(search) {
                     registrosDoDia = registrosDoDia.filter(p => {
                         const nome = modoAtual === 'cgr' ? p.plantonista : p.supervisor;
-                        return nome.toLowerCase().includes(search) || p.diaSemana.toLowerCase().includes(search);
+                        const setor = (p.setor || '').toLowerCase();
+                        const tratativa = (p.tratativa || '').toLowerCase();
+                        return nome.toLowerCase().includes(search) || 
+                               p.diaSemana.toLowerCase().includes(search) ||
+                               setor.includes(search) ||
+                               tratativa.includes(search);
                     });
                 }
 
@@ -594,17 +651,15 @@
             document.getElementById('countFeriados').innerText = c2;
         }
 
-        // Função de Exportação em PDF com Tabela Ordenada Cronologicamente e por Horário
         function exportarTabelaPDF() {
             const dados = modoAtual === 'cgr' ? [...plantoes] : [...supervisores];
-            const tituloPainel = modoAtual === 'cgr' ? "Escala CGR" : "Escala de Supervisores";
+            const tituloPainel = modoAtual === 'cgr' ? "Escala CGR / NOC" : "Escala de Supervisores";
 
             if (!dados || dados.length === 0) {
                 alert("Não há registros cadastrados para exportar.");
                 return;
             }
 
-            // Ordena os registros por data e desempata por horário para o PDF sair em ordem cronológica perfeita
             dados.sort((a, b) => {
                 const d1 = a.data.split('/').reverse().join('');
                 const d2 = b.data.split('/').reverse().join('');
@@ -630,8 +685,8 @@
                     <style>
                         body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
                         h2 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
-                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                         th { background-color: #1e3a8a; color: white; }
                         tr:nth-child(even) { background-color: #f9f9f9; }
                         .footer { margin-top: 30px; font-size: 10px; text-align: center; color: #777; }
@@ -644,8 +699,8 @@
                         <thead>
                             <tr>
                                 <th>Data</th>
-                                <th>Tipo</th>
-                                <th>${modoAtual === 'cgr' ? 'Plantonista' : 'Supervisor'}</th>
+                                <th>Tipo / Setor</th>
+                                <th>${modoAtual === 'cgr' ? 'Colaborador' : 'Supervisor'}</th>
                                 <th>${modoAtual === 'cgr' ? 'Horário / Tratativa' : 'Turno / Região'}</th>
                             </tr>
                         </thead>
@@ -654,11 +709,12 @@
 
             dados.forEach(item => {
                 let nome = modoAtual === 'cgr' ? item.plantonista : item.supervisor;
-                let detalhe = modoAtual === 'cgr' ? `${item.horario} - ${item.tratativa}` : `${item.sigla} (${item.regioes || 'SP'})`;
+                let tipoSetor = modoAtual === 'cgr' ? `${item.categoria.toUpperCase()}${item.setor ? ' - ' + item.setor : ''}` : item.categoria.toUpperCase();
+                let detalhe = modoAtual === 'cgr' ? `<b>${item.horario}</b><br>${item.tratativa}` : `${item.sigla} (${item.regioes || 'SP'})`;
                 htmlConteudo += `
                     <tr>
                         <td>${item.data} (${item.diaSemana})</td>
-                        <td><b>${item.categoria.toUpperCase()}</b></td>
+                        <td><b>${tipoSetor}</b></td>
                         <td>${nome}</td>
                         <td>${detalhe}</td>
                     </tr>
@@ -683,7 +739,6 @@
             }, 300);
         }
 
-        // Modal Detalhes do Dia Ordenado por Horário de Início
         function abrirModalDetalhesDia(dataStr, registros) {
             const modal = document.getElementById('modalDetalhesDia');
             const titulo = document.getElementById('modalDetalhesTitulo');
@@ -703,13 +758,17 @@
 
             registrosOrdenados.forEach(r => {
                 const item = document.createElement('div');
-                item.className = "bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs space-y-1";
+                item.className = "bg-gray-50 dark:bg-gray-900 p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-xs space-y-1.5";
 
                 if (modoAtual === 'cgr') {
+                    const badgeSetor = r.setor ? getBadgeSetor(r.setor) : '';
                     item.innerHTML = `
-                        <div class="font-bold text-sm text-gray-800 dark:text-gray-100">${r.plantonista}</div>
+                        <div class="flex justify-between items-start gap-2">
+                            <span class="font-bold text-sm text-gray-800 dark:text-gray-100">${r.plantonista}</span>
+                            ${badgeSetor}
+                        </div>
                         <div class="text-blue-600 dark:text-blue-400 font-medium"><i class="fa-regular fa-clock"></i> ${r.horario}</div>
-                        <div class="text-gray-600 dark:text-gray-300"><strong>Tratativa:</strong> ${r.tratativa}</div>
+                        <div class="text-gray-600 dark:text-gray-300 leading-relaxed"><strong>Tratativa:</strong> ${r.tratativa}</div>
                     `;
                 } else {
                     const badgeSigla = r.sigla === 'SA' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300' : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300';
@@ -844,7 +903,167 @@
             });
         }
 
-        // Cadastro Personalizado com Regiões Dinâmicas (Seg-Sex vs Fim de Semana)
+        // Resolve nome curto (ex: "Leme", "Francisco", "Leonardo Alves") para o nome completo cadastrado na equipe
+        function resolverNomeColaboradorCgr(nomeCurto) {
+            const limpo = nomeCurto.replace(/[—–-]/g, '').trim().toUpperCase();
+            if (!limpo) return '';
+
+            // 1. Correspondência exata
+            const exato = equipeCgr.find(m => m.nome.toUpperCase() === limpo);
+            if (exato) return exato.nome.toUpperCase();
+
+            // 2. Todos os termos do nome curto estão contidos no nome completo (ex: "LEONARDO ALVES", "LUIZ AUGUSTO")
+            const partes = limpo.split(/\s+/);
+            const porTodasPartes = equipeCgr.find(m => {
+                const alvo = m.nome.toUpperCase();
+                return partes.every(p => alvo.includes(p));
+            });
+            if (porTodasPartes) return porTodasPartes.nome.toUpperCase();
+
+            // 3. Fallback: retorna o próprio nome em maiúsculo
+            return limpo;
+        }
+
+        // Importador Inteligente da Escala Semanal NOC (Blocos por Setor)
+        async function importarEscalaSemanalNoc() {
+            const rawText = document.getElementById('nocWeeklyData').value;
+            const startDateStr = document.getElementById('nocStartDate').value;
+            const endDateStr = document.getElementById('nocEndDate').value;
+            const apenasUteis = document.getElementById('nocApenasUteis').checked;
+
+            if (!rawText.trim() || !startDateStr || !endDateStr) {
+                alert("Por favor, preencha a Data Início, Data Fim e cole o texto da escala semanal NOC.");
+                return;
+            }
+
+            let currDate = new Date(startDateStr + 'T00:00:00');
+            let endDate = new Date(endDateStr + 'T00:00:00');
+
+            if (currDate > endDate) {
+                alert("A Data Início deve ser anterior ou igual à Data Fim.");
+                return;
+            }
+
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const regexSetor = /^(NOC\s+.*|ATIVIDADES\s+GERAIS.*|ESCALA\s+NOTURNA.*)$/i;
+            // Identifica linha de nome: começa com letra (sem bullet/seta), contém horário OU é um nome curto isolado (ex: Romulo, Flavia, Wesley)
+            const regexHorario = /\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i;
+
+            let setorAtual = "NOC GERAL";
+            let registrosBase = [];
+            let atual = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                // Ignora cabeçalho de período no topo (ex: 23/11/26 - 30/11/2026 (10:00))
+                if (/^\d{2}\/\d{2}\/\d{2,4}\s*-\s*\d{2}\/\d{2}\/\d{2,4}/.test(line)) continue;
+
+                // Detecta mudança de setor
+                if (regexSetor.test(line) && !regexHorario.test(line)) {
+                    if (atual) { registrosBase.push(atual); atual = null; }
+                    setorAtual = line.replace(/\s+/g, ' ').toUpperCase();
+                    continue;
+                }
+
+                // Verifica se é início de um novo colaborador
+                // Padrão A: "Nome — 07:00 - 12:00 | 14:00 às 17:00"
+                const matchNomeComHorario = line.match(/^([A-Za-zÀ-ÿ\s]{2,35}?)\s*(?:—|–|-)\s*(\d{2}:\d{2}.*)$/);
+                // Padrão B: Nome sozinho na linha (ex: "Romulo", "Flavia", "Wesley") seguido de horário na próxima linha
+                const ehNomeIsolado = /^[A-Za-zÀ-ÿ\s]{2,30}$/.test(line) && 
+                                      !regexSetor.test(line) && 
+                                      (i + 1 < lines.length && regexHorario.test(lines[i + 1]));
+
+                if (matchNomeComHorario) {
+                    if (atual) registrosBase.push(atual);
+                    atual = {
+                        plantonista: resolverNomeColaboradorCgr(matchNomeComHorario[1]),
+                        setor: setorAtual,
+                        horarios: [matchNomeComHorario[2].trim()],
+                        tratativas: []
+                    };
+                } else if (ehNomeIsolado) {
+                    if (atual) registrosBase.push(atual);
+                    atual = {
+                        plantonista: resolverNomeColaboradorCgr(line),
+                        setor: setorAtual,
+                        horarios: [],
+                        tratativas: []
+                    };
+                } else if (atual) {
+                    // Linha pertence ao colaborador atual (pode ser faixa extra de horário ou descrição de tratativa)
+                    const linhaLimpa = line.replace(/^[•\u2022\u27A1\uFE0F\u0003—–-]+\s*/, '').trim();
+                    if (!linhaLimpa) continue;
+
+                    if (regexHorario.test(linhaLimpa)) {
+                        atual.horarios.push(linhaLimpa);
+                    } else {
+                        atual.tratativas.push(linhaLimpa);
+                    }
+                }
+            }
+            if (atual) registrosBase.push(atual);
+
+            if (registrosBase.length === 0) {
+                alert("Não foi possível identificar colaboradores no texto colado. Verifique o formato.");
+                return;
+            }
+
+            // Monta o texto limpo de horário e tratativa para cada colaborador
+            const itensProntos = registrosBase.map(reg => {
+                const horarioFinal = reg.horarios.length > 0 ? reg.horarios.join(' | ') : 'Turno Integral';
+                // Remove repetições idênticas de tratativa caso existam
+                const tratativasUnicas = [...new Set(reg.tratativas)];
+                let tratativaFinal = tratativasUnicas.length > 0 
+                    ? tratativasUnicas.join(' • ') 
+                    : `Atendimento e rotinas ${reg.setor}`;
+
+                return {
+                    plantonista: reg.plantonista,
+                    setor: reg.setor,
+                    horario: horarioFinal,
+                    tratativa: tratativaFinal
+                };
+            });
+
+            let addedCount = 0;
+            const colecao = 'plantoes';
+
+            while (currDate <= endDate) {
+                const diaSemanaNum = currDate.getDay(); // 0 = Dom, 6 = Sáb
+                const ehFimDeSemana = (diaSemanaNum === 0 || diaSemanaNum === 6);
+
+                if (!apenasUteis || !ehFimDeSemana) {
+                    const diaStr = String(currDate.getDate()).padStart(2, '0');
+                    const mesStr = String(currDate.getMonth() + 1).padStart(2, '0');
+                    const anoStr = currDate.getFullYear();
+                    const dateStr = `${diaStr}/${mesStr}/${anoStr}`;
+                    const diaMesCurto = `${diaStr}/${mesStr}`;
+                    const diaSemana = obterDiaDaSemana(dateStr);
+                    const categoria = FERIADOS_NACIONAIS.includes(diaMesCurto) ? 'feriados' : 'fds';
+
+                    for (let item of itensProntos) {
+                        const itemId = 'noc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                        await window.setDoc(window.doc(window.db, colecao, itemId), {
+                            categoria,
+                            data: dateStr,
+                            diaSemana,
+                            plantonista: item.plantonista,
+                            setor: item.setor,
+                            horario: item.horario,
+                            tratativa: item.tratativa
+                        });
+                        addedCount++;
+                    }
+                }
+                currDate.setDate(currDate.getDate() + 1);
+            }
+
+            alert(`Sucesso! ${itensProntos.length} escalas do NOC identificadas e ${addedCount} registros salvos no calendário.`);
+            document.getElementById('nocWeeklyData').value = '';
+            carregarPlantoesFirebase();
+        }
+
         async function salvarEscalaSemanalSupervisores() {
             const supervisor = document.getElementById('weeklySupervisorSelect').value;
             const sigla = document.getElementById('weeklyScaleType').value;
@@ -921,7 +1140,7 @@
 
             tagsContainer.innerHTML = '';
             const listaAtiva = tipoEquipeAtual === 'cgr' ? equipeCgr : equipeSup;
-            modalTitle.innerHTML = `<i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe ${tipoEquipeAtual === 'cgr' ? 'CGR' : 'Supervisores'}`;
+            modalTitle.innerHTML = `<i class="fa-solid fa-users-gear text-indigo-600"></i> Gerenciar Equipe ${tipoEquipeAtual === 'cgr' ? 'CGR / NOC' : 'Supervisores'}`;
 
             listaAtiva.forEach(m => {
                 const tag = document.createElement('div');
@@ -989,6 +1208,7 @@
             const containerCgr = document.getElementById('containerCamposCgr');
             const containerSup = document.getElementById('containerCamposSup');
             const containerTratativa = document.getElementById('containerTratativa');
+            const containerNocWeekly = document.getElementById('containerNocWeeklyCgr');
             const containerBulkCgr = document.getElementById('containerBulkCgr');
             const containerWeekly = document.getElementById('containerWeeklySupervisor');
 
@@ -1004,14 +1224,15 @@
                 if(adminBtnCgr) adminBtnCgr.className = adminActiveClass;
                 if(adminBtnSup) adminBtnSup.className = adminInactiveClass;
 
-                if(subHeader) subHeader.innerText = "Escala CGR (Fins de Semana e Feriados)";
-                if(label1) label1.innerText = "Fins de Semana Escalados";
+                if(subHeader) subHeader.innerText = "Escala CGR / NOC (Turnos, Fins de Semana e Feriados)";
+                if(label1) label1.innerText = "Turnos / Plantões Escalados";
                 if(label2) label2.innerText = "Feriados Escalados";
-                if(adminTitle) adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR';
+                if(adminTitle) adminTitle.innerHTML = '<i class="fa-solid fa-gear"></i> Painel Admin - Escala CGR / NOC';
                 
                 if(containerCgr) containerCgr.classList.remove('hidden');
                 if(containerSup) containerSup.classList.add('hidden');
                 if(containerTratativa) containerTratativa.classList.remove('hidden');
+                if(containerNocWeekly) containerNocWeekly.classList.remove('hidden');
                 if(containerBulkCgr) containerBulkCgr.classList.remove('hidden');
                 if(containerWeekly) containerWeekly.classList.add('hidden');
             } else {
@@ -1028,6 +1249,7 @@
                 if(containerCgr) containerCgr.classList.add('hidden');
                 if(containerSup) containerSup.classList.remove('hidden');
                 if(containerTratativa) containerTratativa.classList.add('hidden');
+                if(containerNocWeekly) containerNocWeekly.classList.add('hidden');
                 if(containerBulkCgr) containerBulkCgr.classList.add('hidden');
                 if(containerWeekly) containerWeekly.classList.remove('hidden');
             }
@@ -1068,7 +1290,7 @@
         async function salvarItemManual() {
             const id = document.getElementById('editId').value;
             const data = document.getElementById('manualData').value.trim();
-            const diaSemana = document.getElementById('manualDiaSemana').value;
+            const diaSemana = document.getElementById('manualDiaSemana').value || obterDiaDaSemana(data);
             const categoria = document.getElementById('manualCategoria').value;
 
             if(!data) { alert('Preencha a Data!'); return; }
@@ -1088,6 +1310,7 @@
 
             if (modoAtual === 'cgr') {
                 novoObjeto.plantonista = nomeColaborador;
+                novoObjeto.setor = document.getElementById('manualSetor').value;
                 novoObjeto.horario = document.getElementById('manualHorario').value;
                 novoObjeto.tratativa = document.getElementById('manualTratativa').value;
             } else {
@@ -1120,6 +1343,7 @@
 
             if (modoAtual === 'cgr') {
                 document.getElementById('manualPlantonista').value = p.plantonista;
+                if (p.setor) document.getElementById('manualSetor').value = p.setor;
                 document.getElementById('manualHorario').value = p.horario;
                 document.getElementById('manualTratativa').value = p.tratativa;
             } else {
@@ -1156,8 +1380,6 @@
 
             if(!rawText.trim()) { alert('Cole os dados copiados na caixa de texto!'); return; }
 
-            const selectMesAno = document.getElementById('selectMesAno');
-            const [mesStr, anoStr] = selectMesAno.value.split('/');
             const colecao = 'plantoes';
 
             let addedCount = 0;
@@ -1215,6 +1437,7 @@
                     data: dateStr,
                     diaSemana,
                     plantonista: plantonistaEncontrado,
+                    setor: "PLANTÃO CGR",
                     horario: horarioEncontrado,
                     tratativa: tratativaEncontrada
                 };
