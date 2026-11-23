@@ -958,7 +958,7 @@
             return limpo;
         }
 
-        // Importador Inteligente da Escala Semanal NOC (Categoria separada noc_semanal)
+        // Importador Inteligente da Escala Semanal NOC: separa cada faixa de horário e sua respectiva atividade
         async function importarEscalaSemanalNoc() {
             const btnImportar = document.getElementById('btnImportarNoc');
             const rawText = document.getElementById('nocWeeklyData').value;
@@ -984,8 +984,30 @@
             const regexHorario = /\d{2}:\d{2}\s*(?:às|as|-|–|—)\s*\d{2}:\d{2}/i;
 
             let setorAtual = "NOC GERAL";
-            let registrosBase = [];
-            let atual = null;
+            let blocosPorPessoa = [];
+            let pessoaAtual = null;
+            let faixaAtual = null;
+
+            function fecharFaixa() {
+                if (pessoaAtual && faixaAtual) {
+                    const tratativasUnicas = [...new Set(faixaAtual.tratativas)];
+                    const tratativaFinal = tratativasUnicas.length > 0
+                        ? tratativasUnicas.join(' • ')
+                        : `Atendimento e rotinas ${pessoaAtual.setor}`;
+                    blocosPorPessoa.push({
+                        plantonista: pessoaAtual.plantonista,
+                        setor: pessoaAtual.setor,
+                        horario: faixaAtual.horario,
+                        tratativa: tratativaFinal
+                    });
+                    faixaAtual = null;
+                }
+            }
+
+            function fecharPessoa() {
+                fecharFaixa();
+                pessoaAtual = null;
+            }
 
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
@@ -993,7 +1015,7 @@
                 if (/^\d{2}\/\d{2}\/\d{2,4}\s*-\s*\d{2}\/\d{2}\/\d{2,4}/.test(line)) continue;
 
                 if (regexSetor.test(line) && !regexHorario.test(line)) {
-                    if (atual) { registrosBase.push(atual); atual = null; }
+                    fecharPessoa();
                     setorAtual = line.replace(/\s+/g, ' ').toUpperCase();
                     continue;
                 }
@@ -1004,55 +1026,57 @@
                                       (i + 1 < lines.length && regexHorario.test(lines[i + 1]));
 
                 if (matchNomeComHorario) {
-                    if (atual) registrosBase.push(atual);
-                    atual = {
+                    fecharPessoa();
+                    pessoaAtual = {
                         plantonista: resolverNomeColaboradorCgr(matchNomeComHorario[1]),
-                        setor: setorAtual,
-                        horarios: [matchNomeComHorario[2].trim()],
+                        setor: setorAtual
+                    };
+                    faixaAtual = {
+                        horario: matchNomeComHorario[2].trim(),
                         tratativas: []
                     };
                 } else if (ehNomeIsolado) {
-                    if (atual) registrosBase.push(atual);
-                    atual = {
+                    fecharPessoa();
+                    pessoaAtual = {
                         plantonista: resolverNomeColaboradorCgr(line),
-                        setor: setorAtual,
-                        horarios: [],
-                        tratativas: []
+                        setor: setorAtual
                     };
-                } else if (atual) {
+                    faixaAtual = null;
+                } else if (pessoaAtual) {
                     const linhaLimpa = line.replace(/^[•\u2022\u27A1\uFE0F\u0003—–-]+\s*/, '').trim();
                     if (!linhaLimpa) continue;
 
                     if (regexHorario.test(linhaLimpa)) {
-                        atual.horarios.push(linhaLimpa);
+                        // Abre uma nova faixa de horário separada para a mesma pessoa
+                        fecharFaixa();
+                        faixaAtual = {
+                            horario: linhaLimpa,
+                            tratativas: []
+                        };
                     } else {
-                        atual.tratativas.push(linhaLimpa);
+                        if (!faixaAtual) {
+                            faixaAtual = {
+                                horario: 'Turno Integral',
+                                tratativas: []
+                            };
+                        }
+                        faixaAtual.tratativas.push(linhaLimpa);
                     }
                 }
             }
-            if (atual) registrosBase.push(atual);
+            fecharPessoa();
 
-            if (registrosBase.length === 0) {
+            if (blocosPorPessoa.length === 0) {
                 alert("Não foi possível identificar colaboradores no texto colado. Verifique o formato.");
                 return;
             }
 
+            // Deduplica apenas blocos exatamente iguais (mesmo agente + mesmo horário + mesma tratativa)
             const mapaUnicoBloco = new Map();
-            registrosBase.forEach(reg => {
-                const horarioFinal = reg.horarios.length > 0 ? reg.horarios.join(' | ') : 'Turno Integral';
-                const tratativasUnicas = [...new Set(reg.tratativas)];
-                const tratativaFinal = tratativasUnicas.length > 0 
-                    ? tratativasUnicas.join(' • ') 
-                    : `Atendimento e rotinas ${reg.setor}`;
-
-                const chaveBloco = `${reg.plantonista.toUpperCase()}__${horarioFinal.toUpperCase()}`;
+            blocosPorPessoa.forEach(reg => {
+                const chaveBloco = `${reg.plantonista.toUpperCase()}__${reg.horario.toUpperCase()}__${reg.tratativa.toUpperCase()}`;
                 if (!mapaUnicoBloco.has(chaveBloco)) {
-                    mapaUnicoBloco.set(chaveBloco, {
-                        plantonista: reg.plantonista,
-                        setor: reg.setor,
-                        horario: horarioFinal,
-                        tratativa: tratativaFinal
-                    });
+                    mapaUnicoBloco.set(chaveBloco, reg);
                 }
             });
             const itensProntos = Array.from(mapaUnicoBloco.values());
@@ -1149,7 +1173,7 @@
                     }
                 }
 
-                alert(`Concluído! ${addedCount} novo(s) registro(s) adicionado(s) e ${updatedCount} registro(s) atualizado(s).`);
+                alert(`Concluído! ${addedCount} novo(s) bloco(s) adicionado(s) e ${updatedCount} atualizado(s).`);
                 document.getElementById('nocWeeklyData').value = '';
                 await carregarPlantoesFirebase();
             } catch (err) {
@@ -1564,7 +1588,6 @@
             }
         }
 
-        // Limpar Todos corrigido: exclui em lotes paralelos e atualiza o estado local/nuvem com segurança
         async function deleteAllItems() {
             const filtroTipoTabela = document.getElementById('filtroTipoTabela');
             const tipoSelecionado = filtroTipoTabela ? filtroTipoTabela.value : 'todos';
